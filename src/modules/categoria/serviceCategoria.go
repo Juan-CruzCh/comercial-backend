@@ -11,10 +11,10 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func crearCategoriaService(categoria *dto.CategoriaDto) (*dto.CategoriaDto , error) {
-	collection := config.MongoDatabase.Collection("Categoria")	
+func crearCategoriaService(categoria *dto.CategoriaDto, ctx context.Context) (*dto.CategoriaDto, error) {
+	collection := config.MongoDatabase.Collection("Categoria")
 
-	count, err := collection.CountDocuments(context.TODO(), bson.M{"nombre": categoria.Nombre})
+	count, err := collection.CountDocuments(ctx, bson.M{"nombre": categoria.Nombre})
 	if err != nil {
 		return nil, err
 	}
@@ -22,29 +22,29 @@ func crearCategoriaService(categoria *dto.CategoriaDto) (*dto.CategoriaDto , err
 		return nil, fmt.Errorf("la categoría '%s' ya existe", categoria.Nombre)
 	}
 
-	data  := model.Categoria {
-		Nombre:categoria.Nombre,
-		Fecha: time.Now(),
-		Flag: "nuevo",
+	data := model.Categoria{
+		Nombre: categoria.Nombre,
+		Fecha:  time.Now(),
+		Flag:   "nuevo",
 	}
-	_, err =collection.InsertOne(context.TODO(), data)
+	_, err = collection.InsertOne(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 	return categoria, nil
 }
-func ListarCategoriaService() ([]bson.M, error){
+func ListarCategoriaService(ctx context.Context) ([]bson.M, error) {
 	collection := config.MongoDatabase.Collection("Categoria")
-	cursor, err := collection.Find(context.TODO(), bson.M{})
-	
-		if err != nil {
+	cursor, err := collection.Find(ctx, bson.M{})
+
+	if err != nil {
 		return nil, err
 	}
-	var data []bson.M 
-	err =cursor.All(context.TODO(), & data)
-		if err != nil {
+	var data []bson.M
+	err = cursor.All(ctx, &data)
+	if err != nil {
 		return nil, err
 	}
-	return  data , nil
+	return data, nil
 
 }

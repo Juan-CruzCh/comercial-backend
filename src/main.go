@@ -3,15 +3,14 @@ package main
 import (
 	"comercial-backend/src/config"
 	"comercial-backend/src/modules/categoria"
+	"comercial-backend/src/modules/producto"
 
 	"github.com/gin-gonic/gin"
 )
 
-
-
 func main() {
-	
-	var url string ="mongodb://localhost:27017"
+
+	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -25,9 +24,10 @@ func main() {
 	}*/
 
 	router := gin.Default()
-	api:=router.Group("api")
+	api := router.Group("api")
 	// router categorias
-	api.POST("/categorias", categoria.CrearCategoria)
-	api.GET("/categorias", categoria.ListarCategoria)
+	categoria.RouterCategoria(api)
+	producto.RouterProduct(api)
+
 	router.Run(":5000")
 }
