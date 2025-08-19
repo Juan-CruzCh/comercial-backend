@@ -35,3 +35,16 @@ func RegitrarProductoController(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Producto registrado correctamente"})
 
 }
+
+func ListarProductoController(c *gin.Context) {
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+
+	data, err := ListarProductoService(ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}

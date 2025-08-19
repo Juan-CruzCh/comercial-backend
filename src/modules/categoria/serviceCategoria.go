@@ -1,7 +1,7 @@
 package categoria
 
 import (
-	"comercial-backend/src/config"
+	"comercial-backend/src/core/config"
 	"comercial-backend/src/modules/categoria/dto"
 	"comercial-backend/src/modules/categoria/model"
 	"context"
