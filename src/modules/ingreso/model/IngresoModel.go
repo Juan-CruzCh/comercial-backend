@@ -1,0 +1,18 @@
+package model
+
+import (
+	"comercial-backend/src/core/enum"
+	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
+)
+
+type IngresoModel struct {
+	ID         bson.ObjectID `bson:"_id,omitempty"`
+	Codigo     string        `bson:"codigo"`
+	Fecha      time.Time     `bson:"fecha"`
+	Proveedor  bson.ObjectID `bson:"proveedor"`
+	Factura    float64       `bson:"factura"`
+	MontoTotal float64       `bson:"montoTotal"`
+	Flag       enum.Estado   `bson:"flag"`
+}
