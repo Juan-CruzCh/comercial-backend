@@ -20,6 +20,9 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 	}
 	var producto []bson.M
 	err = cursor.All(ctx, &producto)
+	if err != nil {
+		return nil, err
+	}
 	return producto, nil
 
 }
@@ -39,6 +42,7 @@ func RegistrarProductoService(productoDto *dto.ProductoDto, categoria bson.Objec
 		Categoria: categoria,
 		Fecha:     time.Now(),
 		Flag:      "nuevo",
+		Descripcion: productoDto.Descripcion,
 	}
 
 	_, err = collection.InsertOne(ctx, model)

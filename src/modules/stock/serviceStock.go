@@ -14,12 +14,15 @@ func RegitrarStockService(stockDto []dto.StockDto, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection("Stock")
 	var StockModel []model.StockModel
 	for _, v := range stockDto {
+		 productoID, err := bson.ObjectIDFromHex(v.Producto)
+		  if err != nil {
+				return  err
+    		}
 		StockModel = append(StockModel, model.StockModel{
 			Cantidad:         v.Cantidad,
 			FechaVencimiento: v.FechaVencimiento,
-			Producto:         bson.ObjectID{},
+			Producto:        productoID,
 			PrecioUnitario:   v.PrecioUnitario,
-			MontoTotal:       v.MontoTotal,
 			Codigo:           "",
 			Fecha:            time.Now(),
 			Flag:             "nuevo",

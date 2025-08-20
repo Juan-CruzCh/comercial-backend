@@ -13,13 +13,19 @@ func RegitrarStockController(c *gin.Context) {
 	var stock []dto.StockDto
 	err := c.ShouldBind(&stock)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
 	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 60*time.Second)
 	defer cancel()
+
+
+
 	err = RegitrarStockService(stock, ctx)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err)
+		
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{"status": "stock registrado exitosamente"})
 }
