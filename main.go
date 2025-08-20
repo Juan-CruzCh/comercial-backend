@@ -2,11 +2,13 @@ package main
 
 import (
 	"comercial-backend/src/core/config"
+	"comercial-backend/src/modules/almacen"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
 	"comercial-backend/src/modules/proveedor"
 	"comercial-backend/src/modules/stock"
 	"comercial-backend/src/modules/usuario"
+	"comercial-backend/src/modules/venta"
 
 	"github.com/gin-gonic/gin"
 )
@@ -35,5 +37,7 @@ func main() {
 	stock.RouterStock(api)
 	proveedor.RouterProveedor(api)
 	usuario.UsuarioRouter(api)
+	venta.VentaRouter(api)
+	almacen.AlmacenRouter(api)
 	router.Run(":5000")
 }
