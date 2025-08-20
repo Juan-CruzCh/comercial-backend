@@ -6,6 +6,7 @@ import (
 	"comercial-backend/src/modules/producto"
 	"comercial-backend/src/modules/proveedor"
 	"comercial-backend/src/modules/stock"
+	"comercial-backend/src/modules/usuario"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,5 +34,6 @@ func main() {
 	producto.RouterProduct(api)
 	stock.RouterStock(api)
 	proveedor.RouterProveedor(api)
+	usuario.UsuarioRouter(api)
 	router.Run(":5000")
 }

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
@@ -47,5 +48,17 @@ func ListarCategoriaService(ctx context.Context) ([]bson.M, error) {
 		return nil, err
 	}
 	return data, nil
+
+}
+
+func ObtenerCategoriaService(c *gin.Context) {
+
+}
+
+func ActualizarCategoriaService(c *gin.Context) {
+
+}
+
+func EliminarCategoriaService(c *gin.Context) {
 
 }
