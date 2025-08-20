@@ -1,4 +1,4 @@
-package producto
+package service
 
 import (
 	"comercial-backend/src/core/config"
@@ -37,11 +37,11 @@ func RegistrarProductoService(productoDto *dto.ProductoDto, categoria bson.Objec
 	var cantidadSrt string = strconv.Itoa(int(cantidad))
 	codigo = codigo + "-" + cantidadSrt
 	model := model.ProductoModel{
-		Codigo:    codigo,
-		Nombre:    productoDto.Nombre,
-		Categoria: categoria,
-		Fecha:     time.Now(),
-		Flag:      "nuevo",
+		Codigo:      codigo,
+		Nombre:      productoDto.Nombre,
+		Categoria:   categoria,
+		Fecha:       time.Now(),
+		Flag:        "nuevo",
 		Descripcion: productoDto.Descripcion,
 	}
 

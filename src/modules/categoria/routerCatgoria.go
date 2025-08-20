@@ -3,9 +3,9 @@ package categoria
 import "github.com/gin-gonic/gin"
 
 func RouterCategoria(router *gin.RouterGroup) {
-	router.POST("/categorias", CrearCategoriaController)
-	router.GET("/categorias", ListarCategoriaController)
-	router.GET("/categorias/:id", ObtenerCategoriaController)
-	router.PUT("/categorias/:id", ActualizarCategoriaController)
-	router.DELETE("/categorias/:id", EliminarCategoriaController)
+	router.POST("/categoria", CrearCategoriaController)
+	router.GET("/categoria", ListarCategoriaController)
+	router.GET("/categoria/:id", ObtenerCategoriaController)
+	router.PUT("/categoria/:id", ActualizarCategoriaController)
+	router.DELETE("/categoria/:id", EliminarCategoriaController)
 }

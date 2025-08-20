@@ -1,7 +1,8 @@
-package producto
+package controller
 
 import (
 	"comercial-backend/src/modules/producto/dto"
+	"comercial-backend/src/modules/producto/service"
 	"context"
 	"net/http"
 	"time"
@@ -12,14 +13,14 @@ import (
 )
 
 func RegitrarProductoController(c *gin.Context) {
-	validate := validator.New() 
+	validate := validator.New()
 	var productoDto dto.ProductoDto
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
 	err := c.ShouldBindJSON(&productoDto)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = validate.Struct(productoDto)
@@ -34,8 +35,8 @@ func RegitrarProductoController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de categoría inválido"})
 		return
 	}
-	
-	err = RegistrarProductoService(&productoDto, categoriaID, ctx)
+
+	err = service.RegistrarProductoService(&productoDto, categoriaID, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
@@ -49,7 +50,7 @@ func ListarProductoController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
-	data, err := ListarProductoService(ctx)
+	data, err := service.ListarProductoService(ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return

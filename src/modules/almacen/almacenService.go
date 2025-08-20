@@ -32,3 +32,14 @@ func registrarAlmacenService(almacenDto *dto.AlmacenDto, ctx context.Context) er
 	}
 	return nil
 }
+
+func listarAlmacenService(ctx context.Context) ([]bson.M, error) {
+	collection := config.MongoDatabase.Collection("Almacen")
+	cursor, err := collection.Find(ctx, bson.M{"flag": enum.EstadoNuevo})
+	if err != nil {
+		return nil, err
+	}
+	var almacen []bson.M
+	cursor.All(ctx, &almacen)
+	return almacen, nil
+}

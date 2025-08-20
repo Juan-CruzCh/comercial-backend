@@ -37,7 +37,14 @@ func registrarAlmacenController(c *gin.Context) {
 }
 
 func listarAlmacenesController(c *gin.Context) {
-
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	data, err := listarAlmacenService(ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, data)
 }
 
 func obtenerAlmacenController(c *gin.Context) {

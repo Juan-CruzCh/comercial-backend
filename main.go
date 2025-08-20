@@ -5,6 +5,7 @@ import (
 	"comercial-backend/src/modules/almacen"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
+
 	"comercial-backend/src/modules/proveedor"
 	"comercial-backend/src/modules/stock"
 	"comercial-backend/src/modules/usuario"
@@ -33,9 +34,9 @@ func main() {
 	api := router.Group("api")
 	// router categorias
 	categoria.RouterCategoria(api)
-	producto.RouterProduct(api)
-	stock.RouterStock(api)
 	proveedor.RouterProveedor(api)
+	stock.RouterStock(api)
+	producto.RouterProducto(api)
 	usuario.UsuarioRouter(api)
 	venta.VentaRouter(api)
 	almacen.AlmacenRouter(api)
