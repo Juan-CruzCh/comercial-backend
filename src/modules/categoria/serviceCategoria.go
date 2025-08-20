@@ -2,6 +2,7 @@ package categoria
 
 import (
 	"comercial-backend/src/core/config"
+	"comercial-backend/src/core/enum"
 	"comercial-backend/src/modules/categoria/dto"
 	"comercial-backend/src/modules/categoria/model"
 	"context"
@@ -25,7 +26,7 @@ func crearCategoriaService(categoria *dto.CategoriaDto, ctx context.Context) (*d
 	data := model.Categoria{
 		Nombre: categoria.Nombre,
 		Fecha:  time.Now(),
-		Flag:   "nuevo",
+		Flag:   enum.EstadoNuevo,
 	}
 	_, err = collection.InsertOne(ctx, data)
 	if err != nil {
