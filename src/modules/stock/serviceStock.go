@@ -7,6 +7,7 @@ import (
 	"comercial-backend/src/modules/ingreso"
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/model"
+	structstock "comercial-backend/src/modules/stock/structStock"
 	stockUtil "comercial-backend/src/modules/stock/utils"
 	"strconv"
 
@@ -16,10 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
-
-var producto struct {
-	Nombre string `bson:"nombre"`
-}
 
 func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection("Stock")
@@ -53,6 +50,7 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 		err = collection.FindOne(ctx, bson.M{"producto": productoId, "fechaVencimiento": v.FechaVencimiento}).Decode(&stock)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
+				var producto structstock.Producto
 				err = collectionProducto.FindOne(ctx, bson.M{"_id": productoId}).Decode(&producto)
 				if err != nil {
 					return err
