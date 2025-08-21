@@ -7,6 +7,7 @@ import (
 	"comercial-backend/src/modules/producto/dto"
 	"comercial-backend/src/modules/producto/model"
 	"context"
+	"errors"
 	"strconv"
 	"time"
 
@@ -28,11 +29,11 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 
 }
 
-func RegistrarProductoService(productoDto *dto.ProductoDto, categoria *bson.ObjectID, unidadManejo *bson.ObjectID, ctx context.Context) error {
+func RegistrarProductoService(productoDto *dto.ProductoDto, categoria *bson.ObjectID, unidadManejo *bson.ObjectID, ctx context.Context) (bson.M, error) {
 	collection := config.MongoDatabase.Collection("Producto")
 	cantidad, err := collection.CountDocuments(ctx, bson.M{"flag": "nuevo"})
 	if err != nil {
-		return err
+		return bson.M{}, err
 	}
 	var codigo string = utils.GenerarCodigo(productoDto.Nombre)
 	var cantidadSrt string = strconv.Itoa(int(cantidad))
@@ -47,11 +48,22 @@ func RegistrarProductoService(productoDto *dto.ProductoDto, categoria *bson.Obje
 		Descripcion:  productoDto.Descripcion,
 	}
 
-	_, err = collection.InsertOne(ctx, model)
+	resultado, err := collection.InsertOne(ctx, model)
 
 	if err != nil {
 
-		return err
+		return bson.M{}, err
 	}
-	return nil
+	id, ok := resultado.InsertedID.(bson.ObjectID)
+	if !ok {
+		return bson.M{}, errors.New("ocurrio un error al insertar el ingreso")
+	}
+	var producto bson.M
+	err = collection.FindOne(ctx, bson.M{"_id": id}).Decode(&producto)
+
+	if err != nil {
+
+		return bson.M{}, err
+	}
+	return producto, nil
 }

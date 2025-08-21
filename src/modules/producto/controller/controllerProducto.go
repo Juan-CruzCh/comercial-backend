@@ -41,12 +41,12 @@ func RegitrarProductoController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de categoría inválido"})
 		return
 	}
-	err = service.RegistrarProductoService(&productoDto, categoriaID, unidadManejoID, ctx)
+	producto, err := service.RegistrarProductoService(&productoDto, categoriaID, unidadManejoID, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{"message": "Producto registrado correctamente"})
+	c.JSON(http.StatusCreated, producto)
 
 }
 
