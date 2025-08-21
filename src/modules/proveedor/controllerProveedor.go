@@ -23,6 +23,18 @@ func registrarProveedorController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
 		return
 	}
-	 c.JSON(http.StatusCreated, gin.H{"stattus":http.StatusCreated})
+	 c.JSON(http.StatusCreated, gin.H{"status":http.StatusCreated})
+	 
+}
+
+func listarProveedorController(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	data, err := listarProveedorService(ctx)
+	if(err != nil) {
+		c.JSON(http.StatusBadRequest,err.Error())
+		return
+	}
+	 c.JSON(http.StatusOK, data)
 	 
 }

@@ -11,13 +11,14 @@ import (
 	"comercial-backend/src/modules/usuario"
 	"comercial-backend/src/modules/venta"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 
-	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
-	//var url string = "mongodb://localhost:27017"
+	//var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
+	var url string = "mongodb://localhost:27017"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -31,6 +32,7 @@ func main() {
 	}*/
 
 	router := gin.Default()
+	router.Use(cors.Default())
 	api := router.Group("api")
 	// router categorias
 	categoria.RouterCategoria(api)

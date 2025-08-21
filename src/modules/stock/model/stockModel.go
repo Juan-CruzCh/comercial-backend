@@ -15,4 +15,5 @@ type StockModel struct {
 	PrecioUnitario   float64       `bson:"precioUnitario"`
 	Fecha            time.Time     `bson:"fecha"`
 	Flag             string        `bson:"flag"`
+	
 }
