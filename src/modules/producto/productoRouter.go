@@ -14,4 +14,5 @@ func RouterProducto(router *gin.RouterGroup) {
 	//unidadManejo
 
 	router.POST("/unidad/manejo", controller.CrearUnidadController)
+	router.GET("/unidad/manejo", controller.ListarUnidadesController)
 }

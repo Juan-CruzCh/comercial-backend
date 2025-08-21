@@ -2,6 +2,7 @@ package service
 
 import (
 	"comercial-backend/src/core/config"
+	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/producto/dto"
 	"comercial-backend/src/modules/producto/model"
@@ -27,7 +28,7 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 
 }
 
-func RegistrarProductoService(productoDto *dto.ProductoDto, categoria bson.ObjectID, ctx context.Context) error {
+func RegistrarProductoService(productoDto *dto.ProductoDto, categoria *bson.ObjectID, unidadManejo *bson.ObjectID, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection("Producto")
 	cantidad, err := collection.CountDocuments(ctx, bson.M{"flag": "nuevo"})
 	if err != nil {
@@ -37,12 +38,13 @@ func RegistrarProductoService(productoDto *dto.ProductoDto, categoria bson.Objec
 	var cantidadSrt string = strconv.Itoa(int(cantidad))
 	codigo = codigo + "-" + cantidadSrt
 	model := model.ProductoModel{
-		Codigo:      codigo,
-		Nombre:      productoDto.Nombre,
-		Categoria:   categoria,
-		Fecha:       time.Now(),
-		Flag:        "nuevo",
-		Descripcion: productoDto.Descripcion,
+		Codigo:       codigo,
+		Nombre:       productoDto.Nombre,
+		Categoria:    *categoria,
+		Fecha:        time.Now(),
+		Flag:         enum.EstadoNuevo,
+		UnidadManejo: *unidadManejo,
+		Descripcion:  productoDto.Descripcion,
 	}
 
 	_, err = collection.InsertOne(ctx, model)

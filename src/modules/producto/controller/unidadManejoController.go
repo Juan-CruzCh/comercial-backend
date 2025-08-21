@@ -36,7 +36,14 @@ func CrearUnidadController(c *gin.Context) {
 }
 
 func ListarUnidadesController(c *gin.Context) {
-
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	resultado, err := service.ListarUnidadManejoService(ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	c.JSON(http.StatusCreated, resultado)
 }
 
 func ObtenerUnidadController(c *gin.Context) {

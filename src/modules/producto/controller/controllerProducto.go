@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/producto/dto"
 	"comercial-backend/src/modules/producto/service"
 	"context"
@@ -9,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func RegitrarProductoController(c *gin.Context) {
@@ -29,14 +29,19 @@ func RegitrarProductoController(c *gin.Context) {
 		return
 	}
 
-	categoriaID, err := bson.ObjectIDFromHex(productoDto.Categoria)
+	categoriaID, err := utils.ValidadIdMongo(productoDto.Categoria)
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de categoría inválido"})
 		return
 	}
+	unidadManejoID, err := utils.ValidadIdMongo(productoDto.UnidadManejo)
 
-	err = service.RegistrarProductoService(&productoDto, categoriaID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "ID de categoría inválido"})
+		return
+	}
+	err = service.RegistrarProductoService(&productoDto, categoriaID, unidadManejoID, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return

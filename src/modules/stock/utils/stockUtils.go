@@ -36,7 +36,14 @@ func convertirStock(stockDto []dto.StockDto) ([]ingreso.StockDto, error) {
 			FechaVencimiento: s.FechaVencimiento,
 			Producto:         *productoID,
 			PrecioUnitario:   s.PrecioUnitario,
+			MontoTotal:       s.MontoTotal,
+			Descuento:        s.Descuento,
+			SudTotal:         s.SudTotal,
 		})
 	}
 	return result, nil
+}
+
+func GenerarCodigoStock() {
+
 }

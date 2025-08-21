@@ -39,6 +39,7 @@ func RegistrarIngresoStockService(body *IngresoStockData, ctx context.Context) e
 	}
 	var detalleIngreso []model.DetalleIngresoModel
 	for _, v := range body.Stock {
+
 		detalleIngreso = append(detalleIngreso, model.DetalleIngresoModel{
 			Producto:       v.Producto,
 			Cantidad:       v.Cantidad,
@@ -46,6 +47,9 @@ func RegistrarIngresoStockService(body *IngresoStockData, ctx context.Context) e
 			PrecioUnitario: v.PrecioUnitario,
 			Flag:           enum.EstadoNuevo,
 			Ingreso:        ingresoID,
+			MontoTotal:     v.MontoTotal,
+			Descuento:      v.Descuento,
+			SudTotal:       v.SudTotal,
 		})
 
 	}

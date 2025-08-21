@@ -66,6 +66,9 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 					PrecioUnitario:   v.PrecioUnitario,
 					Flag:             enum.EstadoNuevo,
 					Fecha:            fecha,
+					MontoTotal:       v.MontoTotal,
+					Descuento:        v.Descuento,
+					SubTotal:         v.SudTotal,
 				}
 				_, err = collection.InsertOne(ctx, nuevoStock)
 			} else {

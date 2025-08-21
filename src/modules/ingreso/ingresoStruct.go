@@ -18,4 +18,7 @@ type StockDto struct {
 	FechaVencimiento time.Time
 	Producto         bson.ObjectID
 	PrecioUnitario   float64
+	MontoTotal       float64
+	Descuento        float64
+	SudTotal         float64
 }
