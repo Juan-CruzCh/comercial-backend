@@ -1,6 +1,7 @@
 package model
 
 import (
+	"comercial-backend/src/core/enum"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -14,6 +15,5 @@ type StockModel struct {
 	Producto         bson.ObjectID `bson:"producto"`
 	PrecioUnitario   float64       `bson:"precioUnitario"`
 	Fecha            time.Time     `bson:"fecha"`
-	Flag             string        `bson:"flag"`
-	
+	Flag             enum.Estado   `bson:"flag"`
 }

@@ -3,6 +3,7 @@ package stock
 import (
 	"comercial-backend/src/modules/stock/dto"
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,8 +11,9 @@ import (
 )
 
 func RegitrarStockController(c *gin.Context) {
-	var stock []dto.StockDto
-	err := c.ShouldBind(&stock)
+	var body dto.IngresoStockData
+	err := c.ShouldBindJSON(&body)
+	fmt.Println(err)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
@@ -19,11 +21,9 @@ func RegitrarStockController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 60*time.Second)
 	defer cancel()
 
-
-
-	err = RegitrarStockService(stock, ctx)
+	err = RegitrarStockService(body, ctx)
 	if err != nil {
-		
+
 		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}

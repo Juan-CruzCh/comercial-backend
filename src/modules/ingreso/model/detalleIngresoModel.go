@@ -10,6 +10,7 @@ import (
 type DetalleIngresoModel struct {
 	ID             bson.ObjectID `bson:"_id,omitempty"`
 	Producto       bson.ObjectID `bson:"producto"`
+	Ingreso        bson.ObjectID `bson:"ingreso"`
 	Cantidad       int           `bson:"cantidad"`
 	Fecha          time.Time     `bson:"fecha"`
 	PrecioUnitario float64       `bson:"precio_unitario"`

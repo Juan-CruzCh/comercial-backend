@@ -1,6 +1,15 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
+
+type IngresoStockData struct {
+	Proveedor  string     `json:"proveedor"`
+	Factura    string     `json:"factura"`
+	MontoTotal float64    `json:"montoTotal"`
+	Stock      []StockDto `json:"stock"`
+}
 
 type StockDto struct {
 	Cantidad         int       `json:"cantidad"`

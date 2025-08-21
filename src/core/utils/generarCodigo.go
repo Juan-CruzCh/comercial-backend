@@ -12,7 +12,7 @@ func GenerarCodigo(nombre string) string {
 			consonantes += string(c)
 		}
 	}
-	return consonantes
+	return strings.ToUpper(consonantes)
 }
 
 func isConsonante(c rune) bool {
