@@ -7,21 +7,28 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 // Controllers para categoria:
 
 func CrearCategoriaController(c *gin.Context) {
+	validate := validator.New()
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
 	var categoria dto.CategoriaDto
-	if err := c.ShouldBind(&categoria); err != nil {
+	if err := c.ShouldBindJSON(&categoria); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := validate.Struct(categoria)
+	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	_, err := crearCategoriaService(&categoria, ctx)
+	err = crearCategoriaService(&categoria, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
