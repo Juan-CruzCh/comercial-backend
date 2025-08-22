@@ -19,33 +19,29 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 	collection := config.MongoDatabase.Collection("Producto")
 	var pipeline = mongo.Pipeline{
 		bson.D{
-            {Key: "$match", Value: bson.D{
-                {Key: "flag", Value: enum.EstadoNuevo},
-            }},  
-    },
-	utils.Lookup("Categoria", "categoria","_id","categoria"),
-	utils.Lookup("UnidadManejo", "unidadManejo","_id","unidadManejo"),	
-	bson.D{
-		{Key: "$project", Value: bson.D {
+			{Key: "$match", Value: bson.D{
+				{Key: "flag", Value: enum.EstadoNuevo},
+			}},
+		},
+		utils.Lookup("Categoria", "categoria", "_id", "categoria"),
+		utils.Lookup("UnidadManejo", "unidadManejo", "_id", "unidadManejo"),
+		bson.D{
+			{Key: "$project", Value: bson.D{
 				{Key: "nombre", Value: 1},
 				{Key: "descripcion", Value: 1},
 				{Key: "codigo", Value: 1},
-				{Key: "categoria", Value: bson.D{
-					 {Key: "$arrayElemAt", Value: bson.A{"$categoria.nombre", 0}},
-				}},
-				{Key: "unidadManejo", Value: bson.D{
-					 {Key: "$arrayElemAt", Value: bson.A{"$unidadManejo.nombre", 0}},
-				}},
-		} ,
+				{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre", 0)},
+				{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidadManejo.nombre", 0)},
+			},
+			},
 		},
-	}	,
 
-	bson.D{
-		{Key: "$sort", Value: bson.D{
-			{Key: "fecha",Value: -1},
-		},},
-	},
-}
+		bson.D{
+			{Key: "$sort", Value: bson.D{
+				{Key: "fecha", Value: -1},
+			}},
+		},
+	}
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
