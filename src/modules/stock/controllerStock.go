@@ -3,17 +3,22 @@ package stock
 import (
 	"comercial-backend/src/modules/stock/dto"
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 )
 
 func RegitrarStockController(c *gin.Context) {
+	validate := validator.New()
 	var body dto.IngresoStockData
 	err := c.ShouldBindJSON(&body)
-	fmt.Println(err)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = validate.Struct(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -18,7 +18,7 @@ func CountDocumentsStockRepository(ctx context.Context) (int64, error) {
 	return documentos, nil
 }
 
-func VerificarStockRepository(productoId bson.ObjectID, fechaVencimiento time.Time, ctx context.Context) (*model.StockModel, error) {
+func VerificarStockRepository(productoId bson.ObjectID, fechaVencimiento *time.Time, ctx context.Context) (*model.StockModel, error) {
 	collection := config.MongoDatabase.Collection("Stock")
 	var stock model.StockModel
 	err := collection.FindOne(ctx, bson.M{"producto": productoId, "fechaVencimiento": fechaVencimiento}).Decode(&stock)

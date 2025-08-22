@@ -42,7 +42,7 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 			return err
 		}
 
-		stock, err := repositoryStock.VerificarStockRepository(*productoId, v.FechaVencimiento, ctx)
+		stock, err := repositoryStock.VerificarStockRepository(*productoId, &v.FechaVencimiento, ctx)
 
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
