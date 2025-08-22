@@ -1,26 +1,23 @@
 package stock
 
 import (
-	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
 	coreUtil "comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/ingreso"
+	productoRepository "comercial-backend/src/modules/producto/repository"
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/model"
-	structstock "comercial-backend/src/modules/stock/structStock"
+	repositoryStock "comercial-backend/src/modules/stock/repository"
 	stockUtil "comercial-backend/src/modules/stock/utils"
 	"strconv"
 
 	//"comercial-backend/src/modules/stock/utils"
 	"context"
 
-	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error {
-	collection := config.MongoDatabase.Collection("Stock")
-	collectionProducto := config.MongoDatabase.Collection("Producto")
 	fecha, err := coreUtil.FechaHoraBolivia()
 	if err != nil {
 		return err
@@ -33,7 +30,7 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 	if err != nil {
 		return err
 	}
-	documentos, err := collection.CountDocuments(ctx, bson.M{})
+	documentos, err := repositoryStock.CountDocumentsStockRepository(ctx)
 	if err != nil {
 		return err
 	}
@@ -46,12 +43,13 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 		if err != nil {
 			return err
 		}
-		var stock model.StockModel
-		err = collection.FindOne(ctx, bson.M{"producto": productoId, "fechaVencimiento": v.FechaVencimiento}).Decode(&stock)
+
+		stock, err := repositoryStock.VerificarStockRepository(*productoId, v.FechaVencimiento, ctx)
+
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
-				var producto structstock.Producto
-				err = collectionProducto.FindOne(ctx, bson.M{"_id": productoId}).Decode(&producto)
+
+				producto, err := productoRepository.VerificarProductoRepository(*productoId, ctx)
 				if err != nil {
 					return err
 				}
@@ -70,14 +68,17 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 					Descuento:        v.Descuento,
 					SubTotal:         v.SudTotal,
 				}
-				_, err = collection.InsertOne(ctx, nuevoStock)
+				err = repositoryStock.RegistrarStockRepository(&nuevoStock, ctx)
+				if err != nil {
+					return err
+				}
 			} else {
 				return err
 			}
 
 		} else {
 			var cantidad int = v.Cantidad + stock.Cantidad
-			_, err := collection.UpdateOne(ctx, bson.M{"_id": stock.ID}, bson.M{"$set": bson.M{"cantidad": cantidad}})
+			err = repositoryStock.ActualizarStockRepository(stock.ID, cantidad, ctx)
 			if err != nil {
 				return err
 			}
