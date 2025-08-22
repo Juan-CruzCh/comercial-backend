@@ -18,10 +18,8 @@ import (
 )
 
 func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error {
-	fecha, err := coreUtil.FechaHoraBolivia()
-	if err != nil {
-		return err
-	}
+	fecha := coreUtil.FechaHoraBolivia()
+
 	ingresoStock, err := stockUtil.ConvertirDtoAIngreso(body)
 	if err != nil {
 		return err

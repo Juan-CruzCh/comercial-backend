@@ -13,10 +13,8 @@ import (
 )
 
 func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx context.Context) error {
-	fecha, err := utils.FechaHoraBolivia()
-	if err != nil {
-		return err
-	}
+	fecha := utils.FechaHoraBolivia()
+
 	documento, err := ingresoRepository.CountDocumentsIngresoRepository(ctx)
 	if err != nil {
 		return err

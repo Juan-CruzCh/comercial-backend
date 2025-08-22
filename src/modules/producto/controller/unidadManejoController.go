@@ -19,17 +19,17 @@ func CrearUnidadController(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = validate.Struct(body)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = service.CrearUnidadManejoService(&body, ctx)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"status": http.StatusCreated})
@@ -40,7 +40,7 @@ func ListarUnidadesController(c *gin.Context) {
 	defer cancel()
 	resultado, err := service.ListarUnidadManejoService(ctx)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusCreated, resultado)
