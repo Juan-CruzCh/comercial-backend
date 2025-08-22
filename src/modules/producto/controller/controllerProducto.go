@@ -57,7 +57,7 @@ func ListarProductoController(c *gin.Context) {
 
 	data, err := service.ListarProductoService(ctx)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, data)

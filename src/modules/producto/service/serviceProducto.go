@@ -12,11 +12,41 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 	collection := config.MongoDatabase.Collection("Producto")
-	cursor, err := collection.Find(ctx, bson.M{"flag": "nuevo"})
+	var pipeline = mongo.Pipeline{
+		bson.D{
+            {Key: "$match", Value: bson.D{
+                {Key: "flag", Value: enum.EstadoNuevo},
+            }},  
+    },
+	utils.Lookup("Categoria", "categoria","_id","categoria"),
+	utils.Lookup("UnidadManejo", "unidadManejo","_id","unidadManejo"),	
+	bson.D{
+		{Key: "$project", Value: bson.D {
+				{Key: "nombre", Value: 1},
+				{Key: "descripcion", Value: 1},
+				{Key: "codigo", Value: 1},
+				{Key: "categoria", Value: bson.D{
+					 {Key: "$arrayElemAt", Value: bson.A{"$categoria.nombre", 0}},
+				}},
+				{Key: "unidadManejo", Value: bson.D{
+					 {Key: "$arrayElemAt", Value: bson.A{"$unidadManejo.nombre", 0}},
+				}},
+		} ,
+		},
+	}	,
+
+	bson.D{
+		{Key: "$sort", Value: bson.D{
+			{Key: "fecha",Value: -1},
+		},},
+	},
+}
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
@@ -31,7 +61,7 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 
 func RegistrarProductoService(productoDto *dto.ProductoDto, categoria *bson.ObjectID, unidadManejo *bson.ObjectID, ctx context.Context) (bson.M, error) {
 	collection := config.MongoDatabase.Collection("Producto")
-	cantidad, err := collection.CountDocuments(ctx, bson.M{"flag": "nuevo"})
+	cantidad, err := collection.CountDocuments(ctx, bson.M{"flag": enum.EstadoNuevo})
 	if err != nil {
 		return bson.M{}, err
 	}
