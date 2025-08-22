@@ -1,4 +1,4 @@
-package ingreso
+package structIngreso
 
 import (
 	"time"

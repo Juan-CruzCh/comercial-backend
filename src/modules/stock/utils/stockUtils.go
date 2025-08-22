@@ -2,20 +2,21 @@ package utils
 
 import (
 	"comercial-backend/src/core/utils"
-	"comercial-backend/src/modules/ingreso"
+
+	"comercial-backend/src/modules/ingreso/structIngreso"
 	"comercial-backend/src/modules/stock/dto"
 )
 
-func ConvertirDtoAIngreso(dto dto.IngresoStockData) (ingreso.IngresoStockData, error) {
+func ConvertirDtoAIngreso(dto dto.IngresoStockData) (structIngreso.IngresoStockData, error) {
 	ProveedorID, err := utils.ValidadIdMongo(dto.Proveedor)
 	if err != nil {
-		return ingreso.IngresoStockData{}, err
+		return structIngreso.IngresoStockData{}, err
 	}
 	stock, err := convertirStock(dto.Stock)
 	if err != nil {
-		return ingreso.IngresoStockData{}, err
+		return structIngreso.IngresoStockData{}, err
 	}
-	return ingreso.IngresoStockData{
+	return structIngreso.IngresoStockData{
 		Proveedor:  *ProveedorID,
 		Factura:    dto.Factura,
 		MontoTotal: dto.MontoTotal,
@@ -23,15 +24,15 @@ func ConvertirDtoAIngreso(dto dto.IngresoStockData) (ingreso.IngresoStockData, e
 	}, nil
 }
 
-func convertirStock(stockDto []dto.StockDto) ([]ingreso.StockDto, error) {
-	var result []ingreso.StockDto
+func convertirStock(stockDto []dto.StockDto) ([]structIngreso.StockDto, error) {
+	var result []structIngreso.StockDto
 
 	for _, s := range stockDto {
 		productoID, err := utils.ValidadIdMongo(s.Producto)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, ingreso.StockDto{
+		result = append(result, structIngreso.StockDto{
 			Cantidad:         s.Cantidad,
 			FechaVencimiento: s.FechaVencimiento,
 			Producto:         *productoID,
