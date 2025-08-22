@@ -20,6 +20,7 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	var producto []bson.M
 	err = cursor.All(ctx, &producto)
 	if err != nil {

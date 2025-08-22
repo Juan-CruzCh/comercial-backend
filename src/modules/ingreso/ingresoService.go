@@ -5,6 +5,7 @@ import (
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/ingreso/model"
+	"comercial-backend/src/modules/ingreso/structIngreso"
 	"context"
 	"errors"
 	"strconv"
@@ -12,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func RegistrarIngresoStockService(body *IngresoStockData, ctx context.Context) error {
+func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection("Ingreso")
 	collectionDetalleIngreso := config.MongoDatabase.Collection("DetalleIngreso")
 	fecha, err := utils.FechaHoraBolivia()
