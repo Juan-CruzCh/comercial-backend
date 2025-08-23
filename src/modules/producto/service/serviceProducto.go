@@ -19,6 +19,11 @@ func ListarProductoService(ctx context.Context) ([]bson.M, error) {
 
 		return []bson.M{}, err
 	}
+	if data == nil {
+
+		return []bson.M{}, nil
+	}
+
 	return data, nil
 }
 

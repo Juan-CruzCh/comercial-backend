@@ -11,7 +11,7 @@ import (
 )
 
 func CrearProveedorRepository(data *model.ProveedorModel, ctx context.Context) error {
-	collection := config.MongoDatabase.Collection("Proveedor")
+	collection := config.MongoDatabase.Collection(enum.Proveedor)
 	_, err := collection.InsertOne(ctx, data)
 	if err != nil {
 		return err
@@ -20,7 +20,7 @@ func CrearProveedorRepository(data *model.ProveedorModel, ctx context.Context) e
 }
 
 func ListarProveedorRepository(ctx context.Context) ([]bson.M, error) {
-	collection := config.MongoDatabase.Collection("Proveedor")
+	collection := config.MongoDatabase.Collection(enum.Proveedor)
 
 	cursor, err := collection.Find(ctx, bson.M{"flag": enum.EstadoNuevo})
 	if err != nil {

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"comercial-backend/src/core/config"
+	"comercial-backend/src/core/enum"
 	"comercial-backend/src/modules/ingreso/model"
 	"context"
 	"errors"
@@ -10,7 +11,7 @@ import (
 )
 
 func CountDocumentsIngresoRepository(ctx context.Context) (int64, error) {
-	collection := config.MongoDatabase.Collection("Ingreso")
+	collection := config.MongoDatabase.Collection(enum.Ingreso)
 	countDocuments, err := collection.CountDocuments(ctx, bson.M{})
 	if err != nil {
 		return 0, err
@@ -19,7 +20,7 @@ func CountDocumentsIngresoRepository(ctx context.Context) (int64, error) {
 }
 
 func CrearIngresoRepository(data *model.IngresoModel, ctx context.Context) (*bson.ObjectID, error) {
-	collection := config.MongoDatabase.Collection("Ingreso")
+	collection := config.MongoDatabase.Collection(enum.Ingreso)
 	result, err := collection.InsertOne(ctx, data)
 	if err != nil {
 		return &bson.NilObjectID, err

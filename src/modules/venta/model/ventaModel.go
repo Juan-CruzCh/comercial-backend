@@ -10,7 +10,7 @@ import (
 type VentaModel struct {
 	ID         bson.ObjectID `bson:"_id,omitempty"`
 	Codigo     string        `bson:"codigo"`
-	Total      float64       `bson:"total"`
+	MontoTotal float64       `bson:"montoTotal"`
 	FechaVenta time.Time     `bson:"fechaVenta"`
 	Fecha      time.Time     `bson:"fecha"`
 	Flag       enum.Estado   `bson:"flag"`

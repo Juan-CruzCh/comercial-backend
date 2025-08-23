@@ -13,7 +13,7 @@ import (
 )
 
 func ListarProductoRepository(ctx context.Context) ([]bson.M, error) {
-	collection := config.MongoDatabase.Collection("Producto")
+	collection := config.MongoDatabase.Collection(enum.Producto)
 	var pipeline = mongo.Pipeline{
 		bson.D{
 			{Key: "$match", Value: bson.D{
@@ -54,7 +54,7 @@ func ListarProductoRepository(ctx context.Context) ([]bson.M, error) {
 }
 
 func CrearProductoRepository(data *model.ProductoModel, ctx context.Context) (bson.M, error) {
-	collection := config.MongoDatabase.Collection("Producto")
+	collection := config.MongoDatabase.Collection(enum.Producto)
 	resultado, err := collection.InsertOne(ctx, data)
 
 	if err != nil {
@@ -77,7 +77,7 @@ func CrearProductoRepository(data *model.ProductoModel, ctx context.Context) (bs
 }
 
 func CountDocumentsProductoRepository(ctx context.Context) (int64, error) {
-	collection := config.MongoDatabase.Collection("Producto")
+	collection := config.MongoDatabase.Collection(enum.Producto)
 	countDocuments, err := collection.CountDocuments(ctx, bson.M{"flag": enum.EstadoNuevo})
 	if err != nil {
 		return 0, err
@@ -86,7 +86,7 @@ func CountDocumentsProductoRepository(ctx context.Context) (int64, error) {
 }
 
 func VerificarProductoRepository(producuto bson.ObjectID, ctx context.Context) (*model.ProductoModel, error) {
-	collection := config.MongoDatabase.Collection("Producto")
+	collection := config.MongoDatabase.Collection(enum.Producto)
 	var producto model.ProductoModel
 	err := collection.FindOne(ctx, bson.M{"_id": producuto, "flag": enum.EstadoNuevo}).Decode(&producto)
 	if err != nil {

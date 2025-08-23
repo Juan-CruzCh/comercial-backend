@@ -11,7 +11,7 @@ import (
 )
 
 func CrearCategoriaRepository(data *model.Categoria, ctx context.Context) error {
-	collection := config.MongoDatabase.Collection("Categoria")
+	collection := config.MongoDatabase.Collection(enum.Categoria)
 
 	count, err := collection.CountDocuments(ctx, bson.M{"nombre": data.Nombre})
 	if err != nil {
@@ -29,7 +29,7 @@ func CrearCategoriaRepository(data *model.Categoria, ctx context.Context) error 
 }
 
 func ListarCategoriaRepository(ctx context.Context) ([]bson.M, error) {
-	collection := config.MongoDatabase.Collection("Categoria")
+	collection := config.MongoDatabase.Collection(enum.Categoria)
 	cursor, err := collection.Find(ctx, bson.M{"flag": enum.EstadoNuevo})
 
 	if err != nil {
