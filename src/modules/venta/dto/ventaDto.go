@@ -7,7 +7,8 @@ type VentaDto struct {
 }
 
 type DetalleVenta struct {
-	Stock       string  `json:"stock"  binding:"required"`
-	Cantidad    int     `json:"cantidad"  binding:"gte=0"`
-	Preciototal float64 `json:"precioTotal"  binding:"gte=0"`
+	Stock               string  `json:"stock"  binding:"required"`
+	Cantidad            int     `json:"cantidad"  binding:"gte=0"`
+	Preciototal         float64 `json:"precioTotal"  binding:"gte=0"`
+	DescripcionProducto string  `json:"descripcionProducto"  binding:"required"`
 }

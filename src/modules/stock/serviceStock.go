@@ -51,7 +51,7 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 
 				producto, err := productoRepository.VerificarProductoRepository(*productoId, ctx)
 				if err != nil {
-					return err
+					return errors.New("Ocurrio un error al verificar el prodcuto " + err.Error())
 				}
 
 				consonante := coreUtil.GenerarCodigo(producto.Nombre)

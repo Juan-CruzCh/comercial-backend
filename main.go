@@ -2,6 +2,7 @@ package main
 
 import (
 	"comercial-backend/src/core/config"
+	"comercial-backend/src/core/middleware"
 	"comercial-backend/src/modules/almacen"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
@@ -33,6 +34,7 @@ func main() {
 
 	route := gin.Default()
 	route.Use(cors.Default())
+	route.Use(middleware.ValidarTokenAtenticacion())
 	api := route.Group("api")
 	// router categorias
 	categoria.RouterCategoria(api)

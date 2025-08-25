@@ -9,5 +9,5 @@ const (
 type EstadoVenta string
 
 const (
-	Completado = "COMPLETADO"
+	Realizada = "REALIZADA"
 )

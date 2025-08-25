@@ -24,3 +24,12 @@ func RealizarVentaRepository(venta *model.VentaModel, ctx context.Context) (*bso
 	return &ventaID, nil
 
 }
+
+func CountDocumentsVentaRepository(ctx context.Context) (int64, error) {
+	collection := config.MongoDatabase.Collection(enum.Venta)
+	countDocuments, err := collection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return 0, err
+	}
+	return countDocuments, nil
+}
