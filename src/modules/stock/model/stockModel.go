@@ -14,9 +14,6 @@ type StockModel struct {
 	Codigo           string        `bson:"codigo"`
 	Producto         bson.ObjectID `bson:"producto"`
 	PrecioUnitario   float64       `bson:"precioUnitario"`
-	MontoTotal       float64       `bson:"MontoTotal"`
-	Descuento        float64       `bson:"descuento"`
-	SubTotal         float64       `bson:"subTotal"`
 	Fecha            time.Time     `bson:"fecha"`
 	Flag             enum.Estado   `bson:"flag"`
 }

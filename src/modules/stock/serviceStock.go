@@ -9,6 +9,7 @@ import (
 	"comercial-backend/src/modules/stock/model"
 	repositoryStock "comercial-backend/src/modules/stock/repository"
 	stockUtil "comercial-backend/src/modules/stock/utils"
+	"errors"
 	"strconv"
 
 	//"comercial-backend/src/modules/stock/utils"
@@ -45,6 +46,7 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 		stock, err := repositoryStock.VerificarStockRepository(*productoId, &v.FechaVencimiento, ctx)
 
 		if err != nil {
+
 			if err == mongo.ErrNoDocuments {
 
 				producto, err := productoRepository.VerificarProductoRepository(*productoId, ctx)
@@ -62,13 +64,10 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 					PrecioUnitario:   v.PrecioUnitario,
 					Flag:             enum.EstadoNuevo,
 					Fecha:            fecha,
-					MontoTotal:       v.MontoTotal,
-					Descuento:        v.Descuento,
-					SubTotal:         v.SudTotal,
 				}
 				err = repositoryStock.RegistrarStockRepository(&nuevoStock, ctx)
 				if err != nil {
-					return err
+					return errors.New("ocurrio un error al registrar el stock " + err.Error())
 				}
 			} else {
 				return err

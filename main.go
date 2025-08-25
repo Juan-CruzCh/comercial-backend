@@ -5,11 +5,11 @@ import (
 	"comercial-backend/src/modules/almacen"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
+	"comercial-backend/src/modules/venta/router"
 
 	"comercial-backend/src/modules/proveedor"
 	"comercial-backend/src/modules/stock"
 	"comercial-backend/src/modules/usuario"
-	"comercial-backend/src/modules/venta"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -31,16 +31,16 @@ func main() {
 		fmt.Println("👋 Desconectado de MongoDB")
 	}*/
 
-	router := gin.Default()
-	router.Use(cors.Default())
-	api := router.Group("api")
+	route := gin.Default()
+	route.Use(cors.Default())
+	api := route.Group("api")
 	// router categorias
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
 	stock.RouterStock(api)
 	producto.RouterProducto(api)
 	usuario.UsuarioRouter(api)
-	venta.VentaRouter(api)
+	router.VentaRouter(api)
 	almacen.AlmacenRouter(api)
-	router.Run(":3000")
+	route.Run(":3000")
 }

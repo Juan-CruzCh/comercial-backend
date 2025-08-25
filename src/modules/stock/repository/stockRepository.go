@@ -5,6 +5,7 @@ import (
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/modules/stock/model"
 	"context"
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -34,7 +35,7 @@ func RegistrarStockRepository(data *model.StockModel, ctx context.Context) error
 	collection := config.MongoDatabase.Collection(enum.Stock)
 	_, err := collection.InsertOne(ctx, data)
 	if err != nil {
-		return err
+		return errors.New("Ocurrio un error al ingresar el estock" + err.Error())
 	}
 	return nil
 
@@ -47,4 +48,14 @@ func ActualizarStockRepository(stock bson.ObjectID, cantidad int, ctx context.Co
 		return err
 	}
 	return nil
+}
+
+func BuscarStockRepository(stock *bson.ObjectID, ctx context.Context) (*model.StockModel, error) {
+	collection := config.MongoDatabase.Collection(enum.Stock)
+	var stockModel model.StockModel
+	err := collection.FindOne(ctx, bson.M{"_id": stock, "flag": enum.EstadoNuevo}).Decode(&stockModel)
+	if err != nil {
+		return &model.StockModel{}, errors.New("no se enontro el estock: %v" + err.Error())
+	}
+	return &stockModel, nil
 }
