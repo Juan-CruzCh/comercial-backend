@@ -62,42 +62,42 @@ func BuscarStockRepository(stock *bson.ObjectID, ctx context.Context) (*model.St
 	return &stockModel, nil
 }
 
-func ListarStockRepository(ctx context.Context) (*[]bson.M, error){
-		collection := config.MongoDatabase.Collection(enum.Stock)
-		var pipeline mongo.Pipeline = mongo.Pipeline{
+func ListarStockRepository(ctx context.Context) (*[]bson.M, error) {
+	collection := config.MongoDatabase.Collection(enum.Stock)
+	var pipeline mongo.Pipeline = mongo.Pipeline{
 		bson.D{
 			{Key: "$match", Value: bson.D{
 				{Key: "flag", Value: enum.EstadoNuevo},
 			}},
 		},
-		utils.Lookup("Producto", "producto", "_id","producto"),
+		utils.Lookup("Producto", "producto", "_id", "producto"),
 		utils.Unwind("$producto", false),
-		utils.Lookup("Categoria","producto.categoria", "_id","categoria"),
-		utils.Lookup("UnidadManejo","producto.unidadManejo", "_id","unidadManejo"),
+		utils.Lookup("Categoria", "producto.categoria", "_id", "categoria"),
+		utils.Lookup("UnidadManejo", "producto.unidadManejo", "_id", "unidadManejo"),
 		bson.D{
 			{Key: "$project", Value: bson.D{
 				{Key: "codigo", Value: 1},
 				{Key: "cantidad", Value: 1},
+				{Key: "precioUnitario", Value: 1},
 				{Key: "fechaVencimiento", Value: 1},
+				{Key: "descripcion", Value: "$producto.descripcion"},
 				{Key: "producto", Value: "$producto.nombre"},
-				{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre",0)},
-				{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidadManejo.nombre",0)},
-
+				{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre", 0)},
+				{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidadManejo.nombre", 0)},
+			},
 			},
 		},
-		},
-
-		}
-		cursor, err := collection.Aggregate(ctx,pipeline)
-		if err != nil {
-		return &[]bson.M{},  err
-		}
-		defer cursor.Close(ctx)
-		var stock [] bson.M
-		err = cursor.All(ctx, &stock)
-		if err != nil {
-		return &[]bson.M{},  err
-		}
-
-		return &stock, nil
 	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return &[]bson.M{}, err
+	}
+	defer cursor.Close(ctx)
+	var stock []bson.M
+	err = cursor.All(ctx, &stock)
+	if err != nil {
+		return &[]bson.M{}, err
+	}
+
+	return &stock, nil
+}

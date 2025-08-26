@@ -12,29 +12,29 @@ import (
 func registrarProveedorController(c *gin.Context) {
 	var proveedorDto dto.ProveedorDto
 	err := c.ShouldBindJSON(&proveedorDto)
-	if(err != nil) {
-		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 	err = registrarProveedorService(&proveedorDto, ctx)
-	if(err != nil) {
-		c.JSON(http.StatusBadRequest,gin.H{"error": err.Error()})
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	 c.JSON(http.StatusCreated, gin.H{"status":http.StatusCreated})
-	 
+	c.JSON(http.StatusCreated, gin.H{"status": http.StatusCreated})
+
 }
 
 func listarProveedorController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 	data, err := listarProveedorService(ctx)
-	if(err != nil) {
-		c.JSON(http.StatusBadRequest,err.Error())
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	 c.JSON(http.StatusOK, data)
-	 
+	c.JSON(http.StatusOK, data)
+
 }
