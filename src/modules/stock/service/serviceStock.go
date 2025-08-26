@@ -1,4 +1,4 @@
-package stock
+package service
 
 import (
 	"comercial-backend/src/core/enum"
@@ -15,6 +15,7 @@ import (
 	//"comercial-backend/src/modules/stock/utils"
 	"context"
 
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -84,4 +85,12 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 	}
 
 	return nil
+}
+
+func ListarStockService(ctx context.Context) (*[]bson.M, error) {
+	resultado,err:=  repositoryStock.ListarStockRepository(ctx)
+	if err != nil {
+				return &[]bson.M{},  err
+			}
+	return resultado, nil
 }
