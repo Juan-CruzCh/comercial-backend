@@ -40,3 +40,14 @@ func RealizarVenta(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 }
+
+func ListarVentasRealizas(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	resultado, err := service.ListarVentasRealizas(ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, resultado)
+}

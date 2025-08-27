@@ -5,7 +5,7 @@ import (
 	"comercial-backend/src/core/middleware"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
-	"comercial-backend/src/modules/venta/router"
+	ventaRouter "comercial-backend/src/modules/venta/router"
 
 	ingresoRouter "comercial-backend/src/modules/ingreso/router"
 	"comercial-backend/src/modules/proveedor"
@@ -33,19 +33,21 @@ func main() {
 		fmt.Println("👋 Desconectado de MongoDB")
 	}*/
 
-	route := gin.Default()
-	route.Use(cors.Default())
-	route.Use(middleware.ValidarTokenAtenticacion())
-	api := route.Group("api")
+	router := gin.Default()
+	router.Use(cors.Default())
+	router.Use(middleware.ValidarTokenAtenticacion())
+	api := router.Group("api")
 	// router categorias
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
 	routerStock.RouterStock(api)
 	producto.RouterProducto(api)
 	usuario.UsuarioRouter(api)
-	router.VentaRouter(api)
+	ventaRouter.VentaRouter(api)
+	ventaRouter.DetalleVentaRouter(api)
+
 	sucursalRouter.SucursalRouter(api)
 	ingresoRouter.IngresoRouter(api)
 	//almacen.AlmacenRouter(api)
-	route.Run(":3000")
+	router.Run(":3000")
 }

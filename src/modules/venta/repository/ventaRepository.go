@@ -8,6 +8,7 @@ import (
 	"errors"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func RealizarVentaRepository(venta *model.VentaModel, ctx context.Context) (*bson.ObjectID, error) {
@@ -32,4 +33,39 @@ func CountDocumentsVentaRepository(ctx context.Context) (int64, error) {
 		return 0, err
 	}
 	return countDocuments, nil
+}
+
+func ListarVentasRepository(ctx context.Context) (*[]bson.M, error) {
+	collection := config.MongoDatabase.Collection(enum.Venta)
+	var pipeline mongo.Pipeline = mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "flag", Value: enum.EstadoNuevo},
+			}},
+		},
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "codigo", Value: 1},
+				{Key: "montoTotal", Value: 1},
+				{Key: "subTotal", Value: 1},
+				{Key: "fechaVenta", Value: 1},
+				{Key: "descuento", Value: 1},
+			}},
+		},
+	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+
+		return &[]bson.M{}, err
+	}
+	var resultado []bson.M
+	err = cursor.All(ctx, &resultado)
+	if err != nil {
+
+		return &[]bson.M{}, err
+	}
+	defer cursor.Close(ctx)
+
+	return &resultado, nil
+
 }

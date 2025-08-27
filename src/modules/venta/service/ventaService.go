@@ -11,6 +11,8 @@ import (
 	"comercial-backend/src/modules/venta/model"
 	"comercial-backend/src/modules/venta/repository"
 	"context"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
@@ -42,8 +44,8 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 		TipoPago:   enum.Efectivo,
 		Estado:     enum.Realizada,
 		Flag:       enum.EstadoNuevo,
-		Descuento:  body.Descuento,
-		SubTotal: body.SudTotal,
+		Descuento:  *body.Descuento,
+		SubTotal:   body.SudTotal,
 	}
 	ventaID, err := repository.RealizarVentaRepository(&venta, ctx)
 	if err != nil {
@@ -66,16 +68,15 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 			return err
 		}
 		var detalleVenta model.DetalleVentaModel = model.DetalleVentaModel{
-			Producto:    stock.Producto,
-			Stock:       *stockID,
-			Cantidad:    v.Cantidad,
-			Descripcion: v.DescripcionProducto,
-			Venta:       *ventaID,
-			Fecha:       fecha,
-			Flag:        enum.EstadoNuevo,
+			Producto:       stock.Producto,
+			Stock:          *stockID,
+			Cantidad:       v.Cantidad,
+			Descripcion:    v.DescripcionProducto,
+			Venta:          *ventaID,
+			Fecha:          fecha,
+			Flag:           enum.EstadoNuevo,
 			PrecioUnitario: v.PrecioUnitario,
-			PrecioTotal: v.PrecioTotal,
-		
+			PrecioTotal:    v.PrecioTotal,
 		}
 		err = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}
@@ -97,4 +98,12 @@ func validaStockProduct(detalleVenta *[]dto.DetalleVenta, ctx context.Context) e
 	}
 	return nil
 
+}
+
+func ListarVentasRealizas(ctx context.Context) (*[]bson.M, error) {
+	resultado, err := repository.ListarVentasRepository(ctx)
+	if err != nil {
+		return &[]bson.M{}, err
+	}
+	return resultado, nil
 }
