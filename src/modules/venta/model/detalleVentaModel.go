@@ -13,7 +13,8 @@ type DetalleVentaModel struct {
 	Stock       bson.ObjectID `bson:"stock"`
 	Venta       bson.ObjectID `bson:"venta"`
 	Cantidad    int           `bson:"cantidad"`
-	Preciototal float64       `bson:"preciototal"`
+	PrecioTotal float64       `bson:"precioTotal"`
+	PrecioUnitario float64 `bson:"precioUnitario"`
 	Flag        enum.Estado   `bson:"flag"`
 	Fecha       time.Time     `bson:"fecha"`
 	Descripcion string        `bson:"descripcion"`

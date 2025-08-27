@@ -5,7 +5,6 @@ import (
 	"comercial-backend/src/core/utils"
 	stockRopository "comercial-backend/src/modules/stock/repository"
 	"errors"
-	"fmt"
 	"strconv"
 
 	"comercial-backend/src/modules/venta/dto"
@@ -44,6 +43,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 		Estado:     enum.Realizada,
 		Flag:       enum.EstadoNuevo,
 		Descuento:  body.Descuento,
+		SubTotal: body.SudTotal,
 	}
 	ventaID, err := repository.RealizarVentaRepository(&venta, ctx)
 	if err != nil {
@@ -52,7 +52,6 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 	}
 
 	for _, v := range body.DetalleVenta {
-		fmt.Println(v.Preciototal)
 		stockID, err := utils.ValidadIdMongo(v.Stock)
 		if err != nil {
 			return err
@@ -74,7 +73,9 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 			Venta:       *ventaID,
 			Fecha:       fecha,
 			Flag:        enum.EstadoNuevo,
-			Preciototal: v.Preciototal,
+			PrecioUnitario: v.PrecioUnitario,
+			PrecioTotal: v.PrecioTotal,
+		
 		}
 		err = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}

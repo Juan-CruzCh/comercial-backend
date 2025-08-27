@@ -12,6 +12,7 @@ type VentaModel struct {
 	Codigo     string           `bson:"codigo"`
 	MontoTotal float64          `bson:"montoTotal"`
 	Descuento  float64          `bson:"descuento"`
+	SubTotal  float64          `bson:"subTotal"`
 	FechaVenta time.Time        `bson:"fechaVenta"`
 	Fecha      time.Time        `bson:"fecha"`
 	Flag       enum.Estado      `bson:"flag"`
