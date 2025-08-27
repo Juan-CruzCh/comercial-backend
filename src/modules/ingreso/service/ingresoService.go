@@ -1,4 +1,4 @@
-package ingreso
+package service
 
 import (
 	"comercial-backend/src/core/enum"
@@ -10,6 +10,8 @@ import (
 	"context"
 	"errors"
 	"strconv"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx context.Context) error {
@@ -55,4 +57,13 @@ func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx cont
 	}
 	return nil
 
+}
+
+func ListarIngresoService(ctx context.Context) (*[]bson.M, error) {
+
+	resultado, err := repository.ListarIngresoRepository(ctx)
+	if err != nil {
+		return &[]bson.M{}, err
+	}
+	return resultado, nil
 }

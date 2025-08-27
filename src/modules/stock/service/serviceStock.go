@@ -3,17 +3,15 @@ package service
 import (
 	"comercial-backend/src/core/enum"
 	coreUtil "comercial-backend/src/core/utils"
-	"comercial-backend/src/modules/ingreso"
+	ingreso "comercial-backend/src/modules/ingreso/service"
 	productoRepository "comercial-backend/src/modules/producto/repository"
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/model"
 	repositoryStock "comercial-backend/src/modules/stock/repository"
 	stockUtil "comercial-backend/src/modules/stock/utils"
+	"context"
 	"errors"
 	"strconv"
-
-	//"comercial-backend/src/modules/stock/utils"
-	"context"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -88,9 +86,9 @@ func RegitrarStockService(body dto.IngresoStockData, ctx context.Context) error 
 }
 
 func ListarStockService(ctx context.Context) (*[]bson.M, error) {
-	resultado,err:=  repositoryStock.ListarStockRepository(ctx)
+	resultado, err := repositoryStock.ListarStockRepository(ctx)
 	if err != nil {
-				return &[]bson.M{},  err
-			}
+		return &[]bson.M{}, err
+	}
 	return resultado, nil
 }

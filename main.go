@@ -7,6 +7,7 @@ import (
 	"comercial-backend/src/modules/producto"
 	"comercial-backend/src/modules/venta/router"
 
+	ingresoRouter "comercial-backend/src/modules/ingreso/router"
 	"comercial-backend/src/modules/proveedor"
 	routerStock "comercial-backend/src/modules/stock/router"
 	sucursalRouter "comercial-backend/src/modules/sucursal/router"
@@ -18,8 +19,8 @@ import (
 
 func main() {
 
-	//var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
-	var url string = "mongodb://localhost:27017"
+	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
+	//var url string = "mongodb://localhost:27017"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -44,7 +45,7 @@ func main() {
 	usuario.UsuarioRouter(api)
 	router.VentaRouter(api)
 	sucursalRouter.SucursalRouter(api)
-
+	ingresoRouter.IngresoRouter(api)
 	//almacen.AlmacenRouter(api)
 	route.Run(":3000")
 }
