@@ -48,6 +48,7 @@ func main() {
 
 	sucursalRouter.SucursalRouter(api)
 	ingresoRouter.IngresoRouter(api)
+	ingresoRouter.DetalleIngresoRouter(api)
 	//almacen.AlmacenRouter(api)
 	router.Run(":3000")
 }
