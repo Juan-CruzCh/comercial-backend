@@ -1,11 +1,11 @@
 package dto
 
 type UsuarioDto struct {
-	CI        string `json:"ci" validate:"required"`
-	Nombre    string `json:"nombre" validate:"required"`
-	Apellidos string `json:"apellidos" validate:"required"`
-	Username  string `json:"username" validate:"required"`
-	Password  string `json:"password" validate:"required"`
-	Sucursal  string `json:"sucursal" validate:"required"`
-	Rol       string `json:"rol" validate:"required"`
+	CI        string `json:"ci" binding:"required"`
+	Nombre    string `json:"nombre" binding:"required"`
+	Apellidos string `json:"apellidos" binding:"required"`
+	Username  string `json:"username" binding:"required"`
+	Password  string `json:"password" binding:"required"`
+	Sucursal  string `json:"sucursal" binding:"required"`
+	Rol       string `json:"rol" binding:"required"`
 }

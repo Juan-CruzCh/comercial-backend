@@ -31,3 +31,13 @@ func CrearUsuarioRepository(data *model.UsuarioModel, ctx context.Context) error
 	return nil
 
 }
+
+func VeficarUsuarioRepository(username *string, ctx context.Context) (*model.UsuarioModel, error) {
+	collection := config.MongoDatabase.Collection(enum.Usuario)
+	var usuario model.UsuarioModel
+	err := collection.FindOne(ctx, bson.M{"flag": enum.EstadoNuevo, "username": username}).Decode(&usuario)
+	if err != nil {
+		return &model.UsuarioModel{}, err
+	}
+	return &usuario, nil
+}

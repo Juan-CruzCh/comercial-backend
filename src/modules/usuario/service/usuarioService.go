@@ -16,7 +16,7 @@ func CrearUsuarioService(u *dto.UsuarioDto, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	hash, err := utilsUsuario.EncriptarPassword(&u.Password)
+	hash, err := utilsUsuario.EncriptarPassword(u.Password)
 	sucurcalID, err := utils.ValidadIdMongo(u.Sucursal)
 	if err != nil {
 

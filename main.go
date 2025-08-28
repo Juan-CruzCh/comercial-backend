@@ -7,6 +7,8 @@ import (
 	"comercial-backend/src/modules/producto"
 	ventaRouter "comercial-backend/src/modules/venta/router"
 
+	autenticacionRouter "comercial-backend/src/modules/autenticacion/router"
+	cajaRouter "comercial-backend/src/modules/caja/router"
 	ingresoRouter "comercial-backend/src/modules/ingreso/router"
 	"comercial-backend/src/modules/proveedor"
 	routerStock "comercial-backend/src/modules/stock/router"
@@ -37,6 +39,7 @@ func main() {
 	router.Use(middleware.ValidarTokenAtenticacion())
 	api := router.Group("api")
 	// router categorias
+	autenticacionRouter.AutenticacionRouter(api)
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
 	routerStock.RouterStock(api)
@@ -44,7 +47,7 @@ func main() {
 	usuarioRouter.UsuarioRouter(api)
 	ventaRouter.VentaRouter(api)
 	ventaRouter.DetalleVentaRouter(api)
-
+	cajaRouter.CajaRouter(api)
 	sucursalRouter.SucursalRouter(api)
 	ingresoRouter.IngresoRouter(api)
 	ingresoRouter.DetalleIngresoRouter(api)

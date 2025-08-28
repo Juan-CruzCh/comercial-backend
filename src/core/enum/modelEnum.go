@@ -15,4 +15,5 @@ const (
 	Usuario        = "Usuario"
 	Sucursal       = "Sucursal"
 	Proveedor      = "Proveedor"
+	Caja           = "Caja"
 )
