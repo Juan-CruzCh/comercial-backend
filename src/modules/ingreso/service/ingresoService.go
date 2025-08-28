@@ -14,12 +14,12 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx context.Context) error {
+func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx context.Context) (*bson.ObjectID, error) {
 	fecha := utils.FechaHoraBolivia()
 
 	documento, err := ingresoRepository.CountDocumentsIngresoRepository(ctx)
 	if err != nil {
-		return err
+		return  &bson.NilObjectID, err
 	}
 	var codigo string = "IGR-" + strconv.Itoa(int(documento))
 	var ingreso = model.IngresoModel{
@@ -32,7 +32,7 @@ func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx cont
 	}
 	ingresoID, err := ingresoRepository.CrearIngresoRepository(&ingreso, ctx)
 	if err != nil {
-		return err
+		return  &bson.NilObjectID,err
 	}
 	var detalleIngreso []model.DetalleIngresoModel
 	for _, v := range body.Stock {
@@ -53,9 +53,9 @@ func RegistrarIngresoStockService(body *structIngreso.IngresoStockData, ctx cont
 
 	err = repository.CrearDetalleIngresoManyRepository(detalleIngreso, ctx)
 	if err != nil {
-		return errors.New("ocurrio un error al ingresar el detalle de ingreso")
+		return  &bson.NilObjectID ,errors.New("ocurrio un error al ingresar el detalle de ingreso")
 	}
-	return nil
+	return ingresoID, err
 
 }
 

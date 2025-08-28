@@ -20,6 +20,7 @@ func RealizarVentaDetalleRepository(detalleVenta *model.DetalleVentaModel, ctx c
 }
 
 func DetalleVentaRepository(idVenta *bson.ObjectID, ctx context.Context) (*[]bson.M, error) {
+
 	collection := config.MongoDatabase.Collection(enum.DetalleVenta)
 	cursor, err := collection.Find(ctx, bson.M{"venta": idVenta})
 	if err != nil {
@@ -31,6 +32,5 @@ func DetalleVentaRepository(idVenta *bson.ObjectID, ctx context.Context) (*[]bso
 	if err != nil {
 		return &[]bson.M{}, err
 	}
-
 	return &resultado, nil
 }

@@ -11,16 +11,15 @@ import (
 	"comercial-backend/src/modules/proveedor"
 	routerStock "comercial-backend/src/modules/stock/router"
 	sucursalRouter "comercial-backend/src/modules/sucursal/router"
-	"comercial-backend/src/modules/usuario"
+	usuarioRouter "comercial-backend/src/modules/usuario/router"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-
-	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
-	//var url string = "mongodb://localhost:27017"
+	//var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
+	var url string = "mongodb://localhost:27017"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -42,7 +41,7 @@ func main() {
 	proveedor.RouterProveedor(api)
 	routerStock.RouterStock(api)
 	producto.RouterProducto(api)
-	usuario.UsuarioRouter(api)
+	usuarioRouter.UsuarioRouter(api)
 	ventaRouter.VentaRouter(api)
 	ventaRouter.DetalleVentaRouter(api)
 
