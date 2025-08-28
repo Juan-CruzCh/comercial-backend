@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/caja/dto"
 	"comercial-backend/src/modules/caja/service"
 	"context"
@@ -32,5 +33,38 @@ func AbriCajaController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	c.JSON(http.StatusCreated, gin.H{"status": http.StatusCreated})
+
+}
+func CerrarCajaController(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	usuarioID, err := utils.ValidadIdMongo("68b06561b72e50f06889d3ee")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = service.CerrarCajaService(usuarioID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+
+}
+func VerificarCajaController(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	usuarioID, err := utils.ValidadIdMongo("68b06561b72e50f06889d3ee")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = service.VerificarCajaService(usuarioID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 
 }

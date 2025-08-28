@@ -7,6 +7,8 @@ import (
 	"comercial-backend/src/modules/caja/model"
 	"comercial-backend/src/modules/caja/repository"
 	"context"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func AbriCajaService(body *dto.CajaDto, ctx context.Context) error {
@@ -28,7 +30,26 @@ func AbriCajaService(body *dto.CajaDto, ctx context.Context) error {
 		Estado:        enum.Abierto,
 		Fecha:         fecha,
 	}
-	repository.AbrirCajaRepository(&model, ctx)
+	err = repository.AbrirCajaRepository(&model, ctx)
+	if err != nil {
+		return err
+	}
 	return nil
 
+}
+
+func CerrarCajaService(usuario *bson.ObjectID, ctx context.Context) error {
+	err := repository.CerrarCajaRepository(usuario, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func VerificarCajaService(usuario *bson.ObjectID, ctx context.Context) error {
+	err := repository.VerificarCajaRepository(usuario, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
