@@ -14,20 +14,25 @@ import (
 func CrearUsuarioController(c *gin.Context) {
 	validate := validator.New()
 	var body dto.UsuarioDto
-	err:= c.ShouldBindJSON(&body)
+	err := c.ShouldBindJSON(&body)
 	if err != nil {
-		 c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
-		 return
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	err = validate.Struct(body)
 	if err != nil {
-		 c.JSON(http.StatusBadRequest, gin.H{"error":err.Error()})
-		 return
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 20*time.Second)
 	defer cancel()
 
-	service.CrearUsuarioService(&body,ctx)
+	err = service.CrearUsuarioService(&body, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"status": http.StatusCreated})
 }
 
 func ListarUsuarioController(c *gin.Context) {
