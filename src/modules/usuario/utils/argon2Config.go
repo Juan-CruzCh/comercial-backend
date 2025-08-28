@@ -19,7 +19,7 @@ type configArgon2 struct {
 func EncriptarPassword(password *string) (string, error) {
 	var config configArgon2 = configArgon2{
 		memory:      64 * 1024,
-		iterations:  3,
+		iterations:  10,
 		parallelism: 2,
 		saltLength:  16,
 		keyLength:   32,
