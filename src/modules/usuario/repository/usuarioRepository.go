@@ -8,6 +8,7 @@ import (
 	"errors"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 func VeficarUsuarioExisteRepository(username *string, ctx context.Context) (*model.UsuarioModel, error) {
@@ -39,5 +40,18 @@ func VeficarUsuarioRepository(username *string, ctx context.Context) (*model.Usu
 	if err != nil {
 		return &model.UsuarioModel{}, err
 	}
+	return &usuario, nil
+}
+
+func ListarUsuarioRepository(ctx context.Context) (*[]bson.M, error) {
+	collection := config.MongoDatabase.Collection(enum.Usuario)
+	var usuario []bson.M
+	cursor, err := collection.Find(ctx, bson.M{"flag": enum.EstadoNuevo}, options.Find().SetProjection(bson.M{"password": 0}))
+	if err != nil {
+		return &[]bson.M{}, err
+	}
+	defer cursor.Close(ctx)
+	err = cursor.All(ctx, &usuario)
+
 	return &usuario, nil
 }

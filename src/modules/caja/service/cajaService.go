@@ -7,6 +7,8 @@ import (
 	"comercial-backend/src/modules/caja/model"
 	"comercial-backend/src/modules/caja/repository"
 	"context"
+	"errors"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
@@ -39,7 +41,12 @@ func AbriCajaService(body *dto.CajaDto, ctx context.Context) error {
 }
 
 func CerrarCajaService(usuario *bson.ObjectID, ctx context.Context) error {
-	err := repository.CerrarCajaRepository(usuario, ctx)
+	caja, err := repository.BuscarCajaUsuarioRepository(usuario, ctx)
+	if err != nil {
+		return errors.New("No existe niguna caja abierda" + err.Error())
+	}
+	fmt.Println(caja)
+	err = repository.CerrarCajaRepository(&caja.ID, ctx)
 	if err != nil {
 		return err
 	}

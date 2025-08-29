@@ -9,6 +9,8 @@ import (
 	utilsUsuario "comercial-backend/src/modules/usuario/utils"
 	"context"
 	"time"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func CrearUsuarioService(u *dto.UsuarioDto, ctx context.Context) error {
@@ -40,8 +42,12 @@ func CrearUsuarioService(u *dto.UsuarioDto, ctx context.Context) error {
 	return nil
 }
 
-func listarUsuarioService(ctx context.Context) {
-
+func ListarUsuarioService(ctx context.Context) (*[]bson.M, error) {
+	data, err := repository.ListarUsuarioRepository(ctx)
+	if err != nil {
+		return &[]bson.M{}, err
+	}
+	return data, nil
 }
 
 func obtenerUsuarioService(id string, ctx context.Context) {

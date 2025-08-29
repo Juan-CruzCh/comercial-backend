@@ -44,3 +44,14 @@ func AutenticacionController(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 
 }
+
+func CerrarAuntenticacionController(c *gin.Context) {
+	_, existe := c.Get("usuario")
+	if !existe {
+		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
+		return
+	}
+	c.SetCookie("ctx", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+
+}

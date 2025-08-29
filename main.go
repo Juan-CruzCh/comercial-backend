@@ -36,10 +36,11 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.Default())
-	router.Use(middleware.ValidarTokenAtenticacion())
+
 	api := router.Group("api")
 	// router categorias
 	autenticacionRouter.AutenticacionRouter(api)
+	router.Use(middleware.ValidarTokenAtenticacion())
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
 	routerStock.RouterStock(api)

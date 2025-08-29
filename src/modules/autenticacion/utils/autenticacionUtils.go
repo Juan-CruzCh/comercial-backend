@@ -23,18 +23,18 @@ func GenraraToken(usuario bson.ObjectID) (string, error) {
 	return tokenString, nil
 }
 
-func VerifyToken(tokenString string) error {
+func VerifyToken(tokenString string) (jwt.Claims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return claveSecreta, nil
 	})
 
 	if err != nil {
-		return err
+		return token.Claims, err
 	}
-
-	if !token.Valid {
-		return errors.New("invalid token")
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return jwt.MapClaims{}, errors.New("jwt invalido")
 	}
+	return claims, nil
 
-	return nil
 }

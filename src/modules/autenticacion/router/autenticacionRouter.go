@@ -8,4 +8,5 @@ import (
 
 func AutenticacionRouter(router *gin.RouterGroup) {
 	router.POST("/autenticacion", controller.AutenticacionController)
+	router.GET("/logout", controller.CerrarAuntenticacionController)
 }
