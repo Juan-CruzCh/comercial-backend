@@ -52,6 +52,5 @@ func ListarUsuarioRepository(ctx context.Context) (*[]bson.M, error) {
 	}
 	defer cursor.Close(ctx)
 	err = cursor.All(ctx, &usuario)
-
 	return &usuario, nil
 }
