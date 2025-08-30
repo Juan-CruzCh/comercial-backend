@@ -8,6 +8,7 @@ import (
 
 type IngresoStockData struct {
 	Proveedor  bson.ObjectID
+	Usuario    bson.ObjectID
 	Factura    string
 	MontoTotal float64
 	Stock      []StockDto

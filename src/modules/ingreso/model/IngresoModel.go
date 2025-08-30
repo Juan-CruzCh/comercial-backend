@@ -12,6 +12,7 @@ type IngresoModel struct {
 	Codigo     string        `bson:"codigo"`
 	Fecha      time.Time     `bson:"fecha"`
 	Proveedor  bson.ObjectID `bson:"proveedor"`
+	Usuario    bson.ObjectID `bson:"usuario"`
 	Factura    string        `bson:"factura"`
 	MontoTotal float64       `bson:"montoTotal"`
 	Flag       enum.Estado   `bson:"flag"`

@@ -2,7 +2,6 @@ package main
 
 import (
 	"comercial-backend/src/core/config"
-	"comercial-backend/src/core/middleware"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
 	ventaRouter "comercial-backend/src/modules/venta/router"
@@ -40,7 +39,7 @@ func main() {
 	api := router.Group("api")
 	// router categorias
 	autenticacionRouter.AutenticacionRouter(api)
-	router.Use(middleware.ValidarTokenAtenticacion())
+	//router.Use(middleware.ValidarTokenAtenticacion())
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
 	routerStock.RouterStock(api)

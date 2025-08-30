@@ -15,20 +15,20 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
+func RealizarVentaService(body *dto.VentaDto, ctx context.Context) (*bson.ObjectID, error) {
 
 	fecha := utils.FechaHoraBolivia()
 	err := validaStockProduct(&body.DetalleVenta, ctx)
 	if err != nil {
-		return err
+		return &bson.NilObjectID, err
 	}
 	usuarioID, err := utils.ValidadIdMongo("68a8b4dbdb1be7def32f34a0")
 	if err != nil {
-		return err
+		return &bson.NilObjectID, err
 	}
 	sucursalID, err := utils.ValidadIdMongo("68a8b4dbdb1be7def32f34a0")
 	if err != nil {
-		return err
+		return &bson.NilObjectID, err
 	}
 
 	cantidad, _ := repository.CountDocumentsVentaRepository(ctx)
@@ -49,23 +49,23 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 	}
 	ventaID, err := repository.RealizarVentaRepository(&venta, ctx)
 	if err != nil {
-		return err
+		return &bson.NilObjectID, err
 
 	}
 
 	for _, v := range body.DetalleVenta {
 		stockID, err := utils.ValidadIdMongo(v.Stock)
 		if err != nil {
-			return err
+			return &bson.NilObjectID, err
 		}
 		stock, err := stockRopository.BuscarStockRepository(stockID, ctx)
 		if err != nil {
-			return err
+			return &bson.NilObjectID, err
 		}
 		var nuevaCantidad int = stock.Cantidad - v.Cantidad
 		err = stockRopository.ActualizarStockRepository(stock.ID, nuevaCantidad, ctx)
 		if err != nil {
-			return err
+			return &bson.NilObjectID, err
 		}
 		var detalleVenta model.DetalleVentaModel = model.DetalleVentaModel{
 			Producto:       stock.Producto,
@@ -81,7 +81,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context) error {
 		err = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}
 
-	return nil
+	return ventaID, nil
 
 }
 

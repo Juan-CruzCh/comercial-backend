@@ -33,12 +33,12 @@ func RealizarVenta(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = service.RealizarVentaService(&body, ctx)
+	idVenta, err := service.RealizarVentaService(&body, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+	c.JSON(http.StatusOK, gin.H{"idVenta": idVenta})
 }
 
 func ListarVentasRealizas(c *gin.Context) {

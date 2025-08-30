@@ -5,9 +5,11 @@ import (
 
 	"comercial-backend/src/modules/ingreso/structIngreso"
 	"comercial-backend/src/modules/stock/dto"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func ConvertirDtoAIngreso(dto dto.IngresoStockData) (structIngreso.IngresoStockData, error) {
+func ConvertirDtoAIngreso(dto dto.IngresoStockData, usuario *bson.ObjectID) (structIngreso.IngresoStockData, error) {
 	ProveedorID, err := utils.ValidadIdMongo(dto.Proveedor)
 	if err != nil {
 		return structIngreso.IngresoStockData{}, err
@@ -21,6 +23,7 @@ func ConvertirDtoAIngreso(dto dto.IngresoStockData) (structIngreso.IngresoStockD
 		Factura:    dto.Factura,
 		MontoTotal: dto.MontoTotal,
 		Stock:      stock,
+		Usuario:    *usuario,
 	}, nil
 }
 

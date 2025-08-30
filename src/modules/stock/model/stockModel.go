@@ -10,7 +10,7 @@ import (
 type StockModel struct {
 	ID               bson.ObjectID `bson:"_id,omitempty"`
 	Cantidad         int           `bson:"cantidad"`
-	FechaVencimiento time.Time     `bson:"fechaVencimiento"`
+	FechaVencimiento time.Time     `bson:"fechaVencimiento,omitempty"`
 	Codigo           string        `bson:"codigo"`
 	Producto         bson.ObjectID `bson:"producto"`
 	PrecioUnitario   float64       `bson:"precioUnitario"`

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/service"
 	"context"
@@ -27,7 +28,12 @@ func RegitrarStockController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 60*time.Second)
 	defer cancel()
 
-	idIgreso, err :=service.RegitrarStockService(body, ctx)
+	usuario, err := utils.ValidadIdMongo("686d44bed40f5b56465bd415")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	idIgreso, err := service.RegitrarStockService(body, ctx, usuario)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -45,6 +51,6 @@ func ListarStockController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, resultado)
 }
