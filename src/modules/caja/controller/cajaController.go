@@ -13,12 +13,17 @@ import (
 )
 
 func AbriCajaController(c *gin.Context) {
+	usuarioID, _, err := utils.Request(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	validate := validator.New()
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
 	var body dto.CajaDto
-	err := c.ShouldBindJSON(&body)
+	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -28,7 +33,7 @@ func AbriCajaController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = service.AbriCajaService(&body, ctx)
+	err = service.AbriCajaService(&body, ctx, usuarioID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -37,13 +42,14 @@ func AbriCajaController(c *gin.Context) {
 
 }
 func CerrarCajaController(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
-	defer cancel()
-	usuarioID, err := utils.ValidadIdMongo("68b06561b72e50f06889d3ee")
+	usuarioID, _, err := utils.Request(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+
 	err = service.CerrarCajaService(usuarioID, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -53,13 +59,14 @@ func CerrarCajaController(c *gin.Context) {
 
 }
 func VerificarCajaController(c *gin.Context) {
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
-	defer cancel()
-	usuarioID, err := utils.ValidadIdMongo("68b06561b72e50f06889d3ee")
+	usuarioID, _, err := utils.Request(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+
 	err = service.VerificarCajaService(usuarioID, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

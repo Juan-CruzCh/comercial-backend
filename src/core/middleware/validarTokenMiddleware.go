@@ -12,17 +12,17 @@ func ValidarTokenAtenticacion() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := ctx.Cookie("ctx")
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"mensaje": "recurso proivido"})
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": http.StatusForbidden})
 			return
 		}
 		claims, err := utils.VerifyToken(token)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"mensaje": "recurso proivido"})
+			ctx.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": http.StatusForbidden})
 			return
 		}
 		data := claims.(jwt.MapClaims)
-
 		ctx.Set("usuario", data["usuario"])
+		ctx.Set("sucursal", data["sucursal"])
 		ctx.Next()
 	}
 }

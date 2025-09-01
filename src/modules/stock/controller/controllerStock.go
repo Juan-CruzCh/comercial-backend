@@ -13,9 +13,14 @@ import (
 )
 
 func RegitrarStockController(c *gin.Context) {
+	usuarioID, _, err := utils.Request(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	validate := validator.New()
 	var body dto.IngresoStockData
-	err := c.ShouldBindJSON(&body)
+	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -28,12 +33,7 @@ func RegitrarStockController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 60*time.Second)
 	defer cancel()
 
-	usuario, err := utils.ValidadIdMongo("686d44bed40f5b56465bd415")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	idIgreso, err := service.RegitrarStockService(body, ctx, usuario)
+	idIgreso, err := service.RegitrarStockService(body, ctx, usuarioID)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

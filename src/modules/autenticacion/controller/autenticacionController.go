@@ -4,7 +4,6 @@ import (
 	"comercial-backend/src/modules/autenticacion/dto"
 	"comercial-backend/src/modules/autenticacion/service"
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -42,27 +41,6 @@ func AutenticacionController(c *gin.Context) {
 		true,
 		true,
 	)
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
-
-}
-
-func CerrarAuntenticacionController(c *gin.Context) {
-	_, existe := c.Get("usuario")
-	if !existe {
-		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
-		return
-	}
-	c.SetCookie("ctx", "", -1, "/", "", false, true)
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
-
-}
-func VerificarAutenticacion(c *gin.Context) {
-	_, existe := c.Get("usuario")
-	fmt.Println(existe)
-	if !existe {
-		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
-		return
-	}
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 
 }

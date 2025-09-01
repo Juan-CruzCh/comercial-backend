@@ -13,13 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func AbriCajaService(body *dto.CajaDto, ctx context.Context) error {
+func AbriCajaService(body *dto.CajaDto, ctx context.Context, usuarioID *bson.ObjectID) error {
 	fecha := utils.FechaHoraBolivia()
-	usuarioID, err := utils.ValidadIdMongo("68b06561b72e50f06889d3ee")
-	if err != nil {
-		return err
-	}
-	err = repository.VerificarCajaAbierto(usuarioID, ctx)
+
+	err := repository.VerificarCajaAbierto(usuarioID, ctx)
 
 	if err != nil {
 		return err

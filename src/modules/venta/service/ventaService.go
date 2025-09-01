@@ -15,22 +15,13 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func RealizarVentaService(body *dto.VentaDto, ctx context.Context) (*bson.ObjectID, error) {
+func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bson.ObjectID, sucursalID *bson.ObjectID) (*bson.ObjectID, error) {
 
 	fecha := utils.FechaHoraBolivia()
 	err := validaStockProduct(&body.DetalleVenta, ctx)
 	if err != nil {
 		return &bson.NilObjectID, err
 	}
-	usuarioID, err := utils.ValidadIdMongo("68a8b4dbdb1be7def32f34a0")
-	if err != nil {
-		return &bson.NilObjectID, err
-	}
-	sucursalID, err := utils.ValidadIdMongo("68a8b4dbdb1be7def32f34a0")
-	if err != nil {
-		return &bson.NilObjectID, err
-	}
-
 	cantidad, _ := repository.CountDocumentsVentaRepository(ctx)
 	var codigo string = "VEN-" + strconv.Itoa(int(cantidad))
 

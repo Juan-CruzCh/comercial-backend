@@ -4,6 +4,7 @@ import (
 	"comercial-backend/src/modules/usuario/dto"
 	"comercial-backend/src/modules/usuario/service"
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -56,5 +57,25 @@ func ActualizarUsuarioController(c *gin.Context) {
 }
 
 func EliminarUsuarioController(c *gin.Context) {
+
+}
+func CerrarAuntenticacionUsuarioController(c *gin.Context) {
+	_, existe := c.Get("usuario")
+	if !existe {
+		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
+		return
+	}
+	c.SetCookie("ctx", "", -1, "/", "", false, true)
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+
+}
+func VerificarAutenticacionUsuarioController(c *gin.Context) {
+	_, existe := c.Get("usuario")
+	fmt.Println(existe)
+	if !existe {
+		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 
 }

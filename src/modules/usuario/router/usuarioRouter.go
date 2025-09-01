@@ -12,4 +12,6 @@ func UsuarioRouter(router *gin.RouterGroup) {
 	router.GET("/usuario/:id", controller.ObtenerUsuarioController)
 	router.PUT("/usuario/:id", controller.ActualizarUsuarioController)
 	router.DELETE("/usuario/:id", controller.EliminarUsuarioController)
+	router.GET("/usuario/verificar", controller.VerificarAutenticacionUsuarioController)
+	router.GET("/usuario/logout", controller.CerrarAuntenticacionUsuarioController)
 }

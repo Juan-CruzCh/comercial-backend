@@ -1,9 +1,11 @@
 package controller
 
 import (
+	coreUtils "comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/venta/dto"
 	"comercial-backend/src/modules/venta/service"
-	"comercial-backend/src/modules/venta/utils"
+	ventaUtils "comercial-backend/src/modules/venta/utils"
+
 	"context"
 	"net/http"
 	"time"
@@ -13,11 +15,16 @@ import (
 )
 
 func RealizarVenta(c *gin.Context) {
+	usuarioID, sucursalID, err := coreUtils.Request(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	validate := validator.New()
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 20*time.Second)
 	defer cancel()
 	var body dto.VentaDto
-	err := c.ShouldBindJSON(&body)
+	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -28,12 +35,12 @@ func RealizarVenta(c *gin.Context) {
 		return
 	}
 
-	err = utils.ValidarDetalleVentaBsonObjectId(&body.DetalleVenta)
+	err = ventaUtils.ValidarDetalleVentaBsonObjectId(&body.DetalleVenta)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	idVenta, err := service.RealizarVentaService(&body, ctx)
+	idVenta, err := service.RealizarVentaService(&body, ctx, usuarioID, sucursalID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

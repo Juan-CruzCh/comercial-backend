@@ -24,7 +24,7 @@ func AutenticacionService(dto *dto.AutenticacionDto, cxt context.Context) (strin
 	if !ok {
 		return "", errors.New("Contraseña invalida")
 	}
-	token, err := utils.GenraraToken(usuario.ID)
+	token, err := utils.GenraraToken(usuario.ID, usuario.Sucursal)
 	if err != nil {
 		return "", err
 	}

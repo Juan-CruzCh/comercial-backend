@@ -10,11 +10,12 @@ import (
 
 var claveSecreta []byte = []byte("hola soy la clave sercrea")
 
-func GenraraToken(usuario bson.ObjectID) (string, error) {
+func GenraraToken(usuario bson.ObjectID, sucursal bson.ObjectID) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"usuario": usuario,
-		"exp":     time.Now().Add(time.Hour * 4).Unix(),
+		"usuario":  usuario,
+		"sucursal": sucursal,
+		"exp":      time.Now().Add(time.Hour * 4).Unix(),
 	})
 	tokenString, err := token.SignedString(claveSecreta)
 	if err != nil {
