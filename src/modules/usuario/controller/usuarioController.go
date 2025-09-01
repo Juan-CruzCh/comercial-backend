@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/usuario/dto"
 	"comercial-backend/src/modules/usuario/service"
 	"context"
@@ -57,6 +58,20 @@ func ActualizarUsuarioController(c *gin.Context) {
 }
 
 func EliminarUsuarioController(c *gin.Context) {
+	id := c.Param("id")
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	ID, err := utils.ValidadIdMongo(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = service.EliminarUsuarioService(ID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 
 }
 func CerrarAuntenticacionUsuarioController(c *gin.Context) {

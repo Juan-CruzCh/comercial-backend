@@ -57,6 +57,10 @@ func actualizarUsuarioService(id string, u *dto.UsuarioDto, ctx context.Context)
 
 }
 
-func eliminarUsuarioService(id string, ctx context.Context) {
-
+func EliminarUsuarioService(id *bson.ObjectID, ctx context.Context) error {
+	err := repository.EliminarUsuarioRepository(id, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }

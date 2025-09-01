@@ -51,20 +51,19 @@ func ListarUsuarioRepository(ctx context.Context) (*[]bson.M, error) {
 		bson.D{
 			{Key: "$match", Value: bson.D{
 				{Key: "flag", Value: enum.EstadoNuevo},
-			},},
+			}},
 		},
-		utils.Lookup("Sucursal", "sucursal","_id","sucursal"),
+		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
 		bson.D{
 			{Key: "$project", Value: bson.D{
-				{Key: "ci", Value:1},
-				{Key: "nombre", Value:1},
-				{Key: "apellidos", Value:1},
-				{Key: "rol", Value:1},
-				{Key: "username", Value:1},
-				{Key: "sucursal", Value:utils.ArrayElemAt("$sucursal.nombre",0)},
-			},},
+				{Key: "ci", Value: 1},
+				{Key: "nombre", Value: 1},
+				{Key: "apellidos", Value: 1},
+				{Key: "rol", Value: 1},
+				{Key: "username", Value: 1},
+				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
+			}},
 		},
-
 	}
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
@@ -73,4 +72,13 @@ func ListarUsuarioRepository(ctx context.Context) (*[]bson.M, error) {
 	defer cursor.Close(ctx)
 	err = cursor.All(ctx, &usuario)
 	return &usuario, nil
+}
+
+func EliminarUsuarioRepository(id *bson.ObjectID, ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.Usuario)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"flag": enum.EstadoEliminado}})
+	if err != nil {
+		return err
+	}
+	return nil
 }
