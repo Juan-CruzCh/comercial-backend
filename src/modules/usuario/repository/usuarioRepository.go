@@ -3,12 +3,13 @@ package repository
 import (
 	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/usuario/model"
 	"context"
 	"errors"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func VeficarUsuarioExisteRepository(username *string, ctx context.Context) (*model.UsuarioModel, error) {
@@ -46,7 +47,26 @@ func VeficarUsuarioRepository(username *string, ctx context.Context) (*model.Usu
 func ListarUsuarioRepository(ctx context.Context) (*[]bson.M, error) {
 	collection := config.MongoDatabase.Collection(enum.Usuario)
 	var usuario []bson.M
-	cursor, err := collection.Find(ctx, bson.M{"flag": enum.EstadoNuevo}, options.Find().SetProjection(bson.M{"password": 0}))
+	var pipeline mongo.Pipeline = mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "flag", Value: enum.EstadoNuevo},
+			},},
+		},
+		utils.Lookup("Sucursal", "sucursal","_id","sucursal"),
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "ci", Value:1},
+				{Key: "nombre", Value:1},
+				{Key: "apellidos", Value:1},
+				{Key: "rol", Value:1},
+				{Key: "username", Value:1},
+				{Key: "sucursal", Value:utils.ArrayElemAt("$sucursal.nombre",0)},
+			},},
+		},
+
+	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return &[]bson.M{}, err
 	}

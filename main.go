@@ -2,6 +2,7 @@ package main
 
 import (
 	"comercial-backend/src/core/config"
+	"comercial-backend/src/core/middleware"
 	"comercial-backend/src/modules/categoria"
 	"comercial-backend/src/modules/producto"
 	ventaRouter "comercial-backend/src/modules/venta/router"
@@ -19,8 +20,8 @@ import (
 )
 
 func main() {
-	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
-	//var url string = "mongodb://localhost:27017"
+	//var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
+	var url string = "mongodb://localhost:27017"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -38,8 +39,9 @@ func main() {
 
 	api := router.Group("api")
 	// router categorias
+	router.Use(middleware.ValidarTokenAtenticacion())
 	autenticacionRouter.AutenticacionRouter(api)
-	//router.Use(middleware.ValidarTokenAtenticacion())
+	
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
 	routerStock.RouterStock(api)
