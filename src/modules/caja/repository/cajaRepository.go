@@ -75,3 +75,16 @@ func VerificarCajaRepository(usuario *bson.ObjectID, ctx context.Context) error 
 	}
 	return errors.New("Debe abrir la caja")
 }
+
+
+func AsignarTotalVentasCajaRepository(usuario *bson.ObjectID, totalVenta float64,montoFinal float64,ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.Caja)
+	_, err := collection.UpdateOne(ctx, bson.M{"usuario": usuario, "estado": enum.Abierto, "flag": enum.EstadoNuevo}, bson.M{"$set":bson.M{
+		"totalVentas":totalVenta,
+		"montoFinal":montoFinal,
+	}})
+	if err != nil {
+		return  err
+	}
+	return  nil
+}

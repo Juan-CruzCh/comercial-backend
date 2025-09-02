@@ -3,6 +3,7 @@ package repository
 import (
 	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/venta/model"
 	"context"
 	"errors"
@@ -43,6 +44,8 @@ func ListarVentasRepository(ctx context.Context) (*[]bson.M, error) {
 				{Key: "flag", Value: enum.EstadoNuevo},
 			}},
 		},
+		utils.Lookup("Sucursal", "sucursal","_id", "sucursal"),
+			utils.Lookup("Usuario", "usuario","_id", "usuario"),
 		bson.D{
 			{Key: "$project", Value: bson.D{
 				{Key: "codigo", Value: 1},
@@ -50,7 +53,14 @@ func ListarVentasRepository(ctx context.Context) (*[]bson.M, error) {
 				{Key: "subTotal", Value: 1},
 				{Key: "fechaVenta", Value: 1},
 				{Key: "descuento", Value: 1},
+				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre",0)},
+				{Key: "vendedor", Value: utils.ArrayElemAt("$usuario.username",0)},
 			}},
+		},
+		bson.D{
+			{Key: "$sort", Value: bson.D{
+				{Key: "fechaVenta", Value: -1},
+			},},
 		},
 	}
 	cursor, err := collection.Aggregate(ctx, pipeline)

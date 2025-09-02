@@ -75,3 +75,21 @@ func VerificarCajaController(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 
 }
+
+func ListarCajaUsuarioController(c *gin.Context) {
+	usuarioID, _, err := utils.Request(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+
+	data,err := service.ListarCajaUsuarioService(usuarioID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK,data)
+
+}

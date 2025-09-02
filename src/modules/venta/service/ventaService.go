@@ -3,8 +3,10 @@ package service
 import (
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/utils"
+	cajaRopository "comercial-backend/src/modules/caja/repository"
 	stockRopository "comercial-backend/src/modules/stock/repository"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"comercial-backend/src/modules/venta/dto"
@@ -69,9 +71,20 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 			PrecioUnitario: v.PrecioUnitario,
 			PrecioTotal:    v.PrecioTotal,
 		}
-		err = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
+		_ = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}
+	caja, err:= cajaRopository.BuscarCajaUsuarioRepository(usuarioID, ctx)
+	if err != nil {
+		return &bson.NilObjectID, errors.New("Ocurrio un erro en la caja de venta " + err.Error())
+	}
+	fmt.Println(caja.TotalVentas)
+	var totalVenta float64 = caja.TotalVentas + body.MontoTotal
+	var montoFinal float64 = totalVenta  + caja.MontoInicial
+	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal,ctx)
 
+	if err != nil {
+		return &bson.NilObjectID, errors.New("Ocurrio un error en la caja de venta al asignar el total vendido " + err.Error())
+	}
 	return ventaID, nil
 
 }

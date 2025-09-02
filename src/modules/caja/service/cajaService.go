@@ -57,3 +57,11 @@ func VerificarCajaService(usuario *bson.ObjectID, ctx context.Context) error {
 	}
 	return nil
 }
+
+func ListarCajaUsuarioService(usuario *bson.ObjectID, ctx context.Context) (*model.CajaModel, error) {
+	caja, err := repository.BuscarCajaUsuarioRepository(usuario, ctx)
+	if err != nil {
+		return nil, err
+	}
+	return  caja , nil
+}

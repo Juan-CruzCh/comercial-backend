@@ -10,4 +10,5 @@ func CajaRouter(router *gin.RouterGroup) {
 	router.POST("/abrir/caja", controller.AbriCajaController)
 	router.POST("/cerrar/caja", controller.CerrarCajaController)
 	router.POST("/verificar/caja", controller.VerificarCajaController)
+	router.GET("/listar/caja/usuario", controller.ListarCajaUsuarioController)
 }
