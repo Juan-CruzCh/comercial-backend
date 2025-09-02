@@ -20,8 +20,8 @@ import (
 )
 
 func main() {
-	//var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
-	var url string = "mongodb://localhost:27017"
+	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
+	//var url string = "mongodb://localhost:27017"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -36,10 +36,10 @@ func main() {
 
 	router := gin.Default()
 	router.Use(cors.New(cors.Config{
-    AllowOrigins:     []string{"http://localhost:5173"},
-    AllowMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
-    AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-    AllowCredentials: true,
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
 	}))
 
 	api := router.Group("api")
