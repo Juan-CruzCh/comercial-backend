@@ -85,11 +85,11 @@ func ListarCajaUsuarioController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
-	data,err := service.ListarCajaUsuarioService(usuarioID, ctx)
+	data, err := service.ListarCajaUsuarioService(usuarioID, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK,data)
+	c.JSON(http.StatusOK, data)
 
 }

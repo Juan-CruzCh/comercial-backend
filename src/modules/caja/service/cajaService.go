@@ -63,5 +63,5 @@ func ListarCajaUsuarioService(usuario *bson.ObjectID, ctx context.Context) (*mod
 	if err != nil {
 		return nil, err
 	}
-	return  caja , nil
+	return caja, nil
 }
