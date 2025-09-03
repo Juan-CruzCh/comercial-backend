@@ -8,7 +8,6 @@ import (
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/model"
 	repositoryStock "comercial-backend/src/modules/stock/repository"
-	stockUtil "comercial-backend/src/modules/stock/utils"
 	"context"
 	"errors"
 	"strconv"
@@ -17,14 +16,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func RegitrarStockService(body dto.IngresoStockData, ctx context.Context, usuario *bson.ObjectID) (*bson.ObjectID, error) {
+func RegitrarStockService(body *dto.IngresoStockData, ctx context.Context, usuario *bson.ObjectID) (*bson.ObjectID, error) {
 	fecha := coreUtil.FechaHoraBolivia()
-
-	ingresoStock, err := stockUtil.ConvertirDtoAIngreso(body, usuario)
-	if err != nil {
-		return &bson.NilObjectID, err
-	}
-	idIngreso, err := ingreso.RegistrarIngresoStockService(&ingresoStock, ctx)
+	idIngreso, err := ingreso.RegistrarIngresoStockService(body, ctx, usuario) //Registro del ingreso
 	if err != nil {
 		return &bson.NilObjectID, err
 	}

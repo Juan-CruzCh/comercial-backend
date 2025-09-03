@@ -33,7 +33,7 @@ func RegitrarStockController(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 60*time.Second)
 	defer cancel()
 
-	idIgreso, err := service.RegitrarStockService(body, ctx, usuarioID)
+	idIgreso, err := service.RegitrarStockService(&body, ctx, usuarioID)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

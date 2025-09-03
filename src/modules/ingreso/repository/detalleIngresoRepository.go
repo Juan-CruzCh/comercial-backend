@@ -26,25 +26,25 @@ func ListarDetalleIngresoRepository(id *bson.ObjectID, ctx context.Context) (*[]
 				{Key: "ingreso", Value: id},
 			}},
 		},
-		utils.Lookup("Producto", "producto","_id","producto"),
-	
-		utils.Lookup("Categoria", "producto.0.categoria","_id","categoria"),
-	
-		utils.Lookup("UnidadManejo", "producto.0.unidadManejo","_id","unidaManejo"),
+		utils.Lookup("Producto", "producto", "_id", "producto"),
+
+		utils.Lookup("Categoria", "producto.0.categoria", "_id", "categoria"),
+
+		utils.Lookup("UnidadManejo", "producto.0.unidadManejo", "_id", "unidaManejo"),
 		bson.D{
 			{Key: "$project", Value: bson.D{
-				{Key: "cantidad",Value: 1},
-					{Key: "precioUnitario",Value: 1},
-					{Key: "montoTotal",Value: 1},
-					{Key: "descuento",Value: 1},
-					{Key: "sudTotal",Value: 1},
-					{Key: "producto",Value: utils.ArrayElemAt("$producto.nombre",0)},
-					{Key: "descripcion",Value: utils.ArrayElemAt("$producto.descripcion",0)},
-					{Key: "codigo",Value: utils.ArrayElemAt("$producto.codigo",0)},
-					{Key: "categoria",Value: utils.ArrayElemAt("$categoria.nombre",0)},
-					{Key: "unidadManejo",Value: utils.ArrayElemAt("$unidaManejo.nombre",0)},
-					
-			},},
+				{Key: "cantidad", Value: 1},
+				{Key: "precioUnitario", Value: 1},
+				{Key: "montoTotal", Value: 1},
+				{Key: "descuento", Value: 1},
+				{Key: "sudTotal", Value: 1},
+				{Key: "fechaVencimiento", Value: 1},
+				{Key: "producto", Value: utils.ArrayElemAt("$producto.nombre", 0)},
+				{Key: "descripcion", Value: utils.ArrayElemAt("$producto.descripcion", 0)},
+				{Key: "codigo", Value: utils.ArrayElemAt("$producto.codigo", 0)},
+				{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre", 0)},
+				{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidaManejo.nombre", 0)},
+			}},
 		},
 	}
 	cursor, err := collection.Aggregate(ctx, pipeline)

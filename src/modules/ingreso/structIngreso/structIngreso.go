@@ -11,10 +11,11 @@ type IngresoStockData struct {
 	Usuario    bson.ObjectID
 	Factura    string
 	MontoTotal float64
-	Stock      []StockDto
+	Stock      []DetalleIngresoData
 }
 
-type StockDto struct {
+type DetalleIngresoData struct {
+	CodigoStock      string
 	Cantidad         int
 	FechaVencimiento time.Time
 	Producto         bson.ObjectID
