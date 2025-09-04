@@ -5,9 +5,11 @@ import (
 )
 
 func GenerarCodigo(nombre string) string {
+
 	consonantes := ""
 	nombre = strings.ToLower(nombre)
-	for _, c := range nombre {
+	nombreSplit := strings.Split(nombre, " ")
+	for _, c := range nombreSplit[0] {
 		if isConsonante(c) {
 			consonantes += string(c)
 		}

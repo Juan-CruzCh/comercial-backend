@@ -9,6 +9,7 @@ import (
 
 type DetalleIngresoModel struct {
 	ID               bson.ObjectID `bson:"_id,omitempty"`
+	CodigoStock      string        `bson:"codigoStock"`
 	Producto         bson.ObjectID `bson:"producto"`
 	Ingreso          bson.ObjectID `bson:"ingreso"`
 	Cantidad         int           `bson:"cantidad"`

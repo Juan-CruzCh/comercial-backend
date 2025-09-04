@@ -11,9 +11,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func CrearDetalleIngresoManyRepository(data []model.DetalleIngresoModel, ctx context.Context) error {
+func CrearDetalleIngresoRepository(data model.DetalleIngresoModel, ctx context.Context) error {
 	collectionDetalleIngreso := config.MongoDatabase.Collection(enum.DetalleIngreso)
-	_, err := collectionDetalleIngreso.InsertMany(ctx, data)
+	_, err := collectionDetalleIngreso.InsertOne(ctx, data)
 	return err
 }
 

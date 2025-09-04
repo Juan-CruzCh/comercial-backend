@@ -20,7 +20,7 @@ func RegitrarStockController(c *gin.Context) {
 		return
 	}
 	validate := validator.New()
-	var body dto.IngresoStockData
+	var body dto.IngresoStockDto
 	err = c.ShouldBindJSON(&body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -53,16 +53,16 @@ func ListarStockController(c *gin.Context) {
 	nombreProducto := c.Query("nombreProducto")
 	categoria := c.Query("categoria")
 	unidadManejo := c.Query("unidadManejo")
-	var buscador structstock.FiltrosStock = structstock.FiltrosStock {
-		Codigo: codigo,
+	var buscador structstock.FiltrosStock = structstock.FiltrosStock{
+		Codigo:         codigo,
 		ProductoNombre: nombreProducto,
-		Categoria: categoria,
-		UnidadManejo: unidadManejo,
+		Categoria:      categoria,
+		UnidadManejo:   unidadManejo,
 	}
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 20*time.Second)
 	defer cancel()
-	resultado, err := service.ListarStockService(&buscador, pagina,limite,ctx)
+	resultado, err := service.ListarStockService(&buscador, pagina, limite, ctx)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

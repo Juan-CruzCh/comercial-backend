@@ -4,6 +4,7 @@ import (
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/structCore"
 	coreUtil "comercial-backend/src/core/utils"
+	"comercial-backend/src/modules/ingreso/service"
 	ingreso "comercial-backend/src/modules/ingreso/service"
 	productoRepository "comercial-backend/src/modules/producto/repository"
 	"comercial-backend/src/modules/stock/dto"
@@ -18,7 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func RegitrarStockService(body *dto.IngresoStockData, ctx context.Context, usuario *bson.ObjectID) (*bson.ObjectID, error) {
+func RegitrarStockService(body *dto.IngresoStockDto, ctx context.Context, usuario *bson.ObjectID) (*bson.ObjectID, error) {
 	fecha := coreUtil.FechaHoraBolivia()
 	idIngreso, err := ingreso.RegistrarIngresoStockService(body, ctx, usuario) //Registro del ingreso
 	if err != nil {
@@ -43,12 +44,10 @@ func RegitrarStockService(body *dto.IngresoStockData, ctx context.Context, usuar
 		if err != nil {
 
 			if err == mongo.ErrNoDocuments {
-
 				producto, err := productoRepository.VerificarProductoRepository(*productoId, ctx)
 				if err != nil {
 					return &bson.NilObjectID, errors.New("Ocurrio un error al verificar el prodcuto " + err.Error())
 				}
-
 				consonante := coreUtil.GenerarCodigo(producto.Nombre)
 				var codigo string = consonante + "-" + strconv.Itoa(int(contador))
 				var nuevoStock = model.StockModel{
@@ -64,8 +63,9 @@ func RegitrarStockService(body *dto.IngresoStockData, ctx context.Context, usuar
 				if err != nil {
 					return &bson.NilObjectID, errors.New("ocurrio un error al registrar el stock " + err.Error())
 				}
+				service.RegitrarDetalleIngresoService(v, idIngreso, codigo, ctx)
 			} else {
-				return &bson.NilObjectID, err
+				return nil, err
 			}
 
 		} else {
@@ -73,6 +73,10 @@ func RegitrarStockService(body *dto.IngresoStockData, ctx context.Context, usuar
 			err = repositoryStock.ActualizarStockRepository(stock.ID, cantidad, ctx)
 			if err != nil {
 				return &bson.NilObjectID, err
+			}
+			err = service.RegitrarDetalleIngresoService(v, idIngreso, stock.Codigo, ctx)
+			if err != nil {
+				return nil, err
 			}
 		}
 

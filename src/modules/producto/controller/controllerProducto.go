@@ -4,8 +4,10 @@ import (
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/producto/dto"
 	"comercial-backend/src/modules/producto/service"
+	"comercial-backend/src/modules/producto/structs"
 	"context"
 	"net/http"
+
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -51,11 +53,25 @@ func RegitrarProductoController(c *gin.Context) {
 }
 
 func ListarProductoController(c *gin.Context) {
-
+	pagina, limite, err := utils.Paginador(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	codigo := c.Query("codigo")
+	nombreProducto := c.Query("nombreProducto")
+	categoria := c.Query("categoria")
+	unidadManejo := c.Query("unidadManejo")
+	var buscador structs.FiltrosProductoStruct = structs.FiltrosProductoStruct{
+		Codigo:         codigo,
+		ProductoNombre: nombreProducto,
+		Categoria:      categoria,
+		UnidadManejo:   unidadManejo,
+	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
 
-	data, err := service.ListarProductoService(ctx)
+	data, err := service.ListarProductoService(&buscador, pagina, limite, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

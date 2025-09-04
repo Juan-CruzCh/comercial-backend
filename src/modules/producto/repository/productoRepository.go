@@ -5,6 +5,7 @@ import (
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/producto/model"
+	"comercial-backend/src/modules/producto/structs"
 	"context"
 	"errors"
 
@@ -12,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func ListarProductoRepository(ctx context.Context) ([]bson.M, error) {
+func ListarProductoRepository(filtros *structs.FiltrosProductoStruct, pagina int, limite int, ctx context.Context) ([]bson.M, error) {
 	collection := config.MongoDatabase.Collection(enum.Producto)
 	var pipeline = mongo.Pipeline{
 		bson.D{
@@ -22,6 +23,30 @@ func ListarProductoRepository(ctx context.Context) ([]bson.M, error) {
 		},
 		utils.Lookup("Categoria", "categoria", "_id", "categoria"),
 		utils.Lookup("UnidadManejo", "unidadManejo", "_id", "unidadManejo"),
+	}
+	if filtros.Codigo != "" {
+		pipeline = append(pipeline, utils.RegexMatch("codigo", filtros.Codigo))
+	}
+	if filtros.ProductoNombre != "" {
+		pipeline = append(pipeline, utils.RegexMatch("nombre", filtros.ProductoNombre))
+	}
+	if filtros.Categoria != "" {
+		ID, err := utils.ValidadIdMongo(filtros.Categoria)
+		if err != nil {
+			return nil, err
+		}
+		pipeline = append(pipeline, utils.Match("categoria", ID))
+	}
+	if filtros.UnidadManejo != "" {
+		ID, err := utils.ValidadIdMongo(filtros.UnidadManejo)
+		if err != nil {
+			return nil, err
+		}
+
+		pipeline = append(pipeline, utils.Match("unidadManejo", ID))
+	}
+
+	pipeline = append(pipeline,
 		bson.D{
 			{Key: "$project", Value: bson.D{
 				{Key: "nombre", Value: 1},
@@ -32,13 +57,7 @@ func ListarProductoRepository(ctx context.Context) ([]bson.M, error) {
 			},
 			},
 		},
-
-		bson.D{
-			{Key: "$sort", Value: bson.D{
-				{Key: "fecha", Value: -1},
-			}},
-		},
-	}
+	)
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err

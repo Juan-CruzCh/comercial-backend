@@ -6,6 +6,7 @@ import (
 	"comercial-backend/src/modules/producto/dto"
 	"comercial-backend/src/modules/producto/model"
 	"comercial-backend/src/modules/producto/repository"
+	"comercial-backend/src/modules/producto/structs"
 	"context"
 	"strconv"
 	"time"
@@ -13,8 +14,8 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func ListarProductoService(ctx context.Context) ([]bson.M, error) {
-	data, err := repository.ListarProductoRepository(ctx)
+func ListarProductoService(filtros *structs.FiltrosProductoStruct, pagina int, limite int, ctx context.Context) ([]bson.M, error) {
+	data, err := repository.ListarProductoRepository(filtros, pagina, limite, ctx)
 	if err != nil {
 
 		return []bson.M{}, err

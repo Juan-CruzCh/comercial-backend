@@ -9,7 +9,6 @@ import (
 	structstock "comercial-backend/src/modules/stock/structStock"
 	"context"
 	"errors"
-	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -83,7 +82,7 @@ func ListarStockRepository(filtros *structstock.FiltrosStock, pagina int, limite
 	if filtros.Codigo != "" {
 		pipeline = append(pipeline, utils.RegexMatch("codigo", filtros.Codigo))
 	}
-	fmt.Println(filtros.ProductoNombre)
+
 	if filtros.ProductoNombre != "" {
 		pipeline = append(pipeline, utils.RegexMatch("producto.nombre", filtros.ProductoNombre))
 	}
