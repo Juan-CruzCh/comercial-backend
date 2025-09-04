@@ -86,6 +86,7 @@ func ListarStockRepository(filtros *structstock.FiltrosStock, pagina int, limite
 	if filtros.ProductoNombre != "" {
 		pipeline = append(pipeline, utils.RegexMatch("producto.nombre", filtros.ProductoNombre))
 	}
+
 	if filtros.Categoria != "" {
 		ID, err := utils.ValidadIdMongo(filtros.Categoria)
 		if err != nil {

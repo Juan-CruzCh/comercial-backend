@@ -3,17 +3,19 @@ package repository
 import (
 	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/producto/model"
 	"comercial-backend/src/modules/producto/structs"
 	"context"
 	"errors"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func ListarProductoRepository(filtros *structs.FiltrosProductoStruct, pagina int, limite int, ctx context.Context) ([]bson.M, error) {
+func ListarProductoRepository(filtros *structs.FiltrosProductoStruct, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
 	collection := config.MongoDatabase.Collection(enum.Producto)
 	var pipeline = mongo.Pipeline{
 		bson.D{
@@ -30,12 +32,13 @@ func ListarProductoRepository(filtros *structs.FiltrosProductoStruct, pagina int
 	if filtros.ProductoNombre != "" {
 		pipeline = append(pipeline, utils.RegexMatch("nombre", filtros.ProductoNombre))
 	}
+	fmt.Println("categorua", filtros.Categoria)
 	if filtros.Categoria != "" {
 		ID, err := utils.ValidadIdMongo(filtros.Categoria)
 		if err != nil {
 			return nil, err
 		}
-		pipeline = append(pipeline, utils.Match("categoria", ID))
+		pipeline = append(pipeline, utils.Match("categoria._id", ID))
 	}
 	if filtros.UnidadManejo != "" {
 		ID, err := utils.ValidadIdMongo(filtros.UnidadManejo)
@@ -43,7 +46,7 @@ func ListarProductoRepository(filtros *structs.FiltrosProductoStruct, pagina int
 			return nil, err
 		}
 
-		pipeline = append(pipeline, utils.Match("unidadManejo", ID))
+		pipeline = append(pipeline, utils.Match("unidadManejo._id", ID))
 	}
 
 	pipeline = append(pipeline,
@@ -58,18 +61,28 @@ func ListarProductoRepository(filtros *structs.FiltrosProductoStruct, pagina int
 			},
 		},
 	)
+	pipeline = append(pipeline, bson.D{{Key: "$skip", Value: utils.Skip(pagina, limite)}})
+	pipeline = append(pipeline, bson.D{{Key: "$limit", Value: limite}})
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return nil, err
 	}
+
 	defer cursor.Close(ctx)
 
+	documentos, err := collection.CountDocuments(ctx, bson.M{"flag": enum.EstadoNuevo})
+
+	paginas := utils.CalcularPaginas(int(documentos), limite)
 	var producto []bson.M
 	err = cursor.All(ctx, &producto)
 	if err != nil {
 		return nil, err
 	}
-	return producto, nil
+	var resultado structCore.ResultadoPaginado = structCore.ResultadoPaginado{
+		Data:    producto,
+		Paginas: paginas,
+	}
+	return &resultado, nil
 }
 
 func CrearProductoRepository(data *model.ProductoModel, ctx context.Context) (bson.M, error) {

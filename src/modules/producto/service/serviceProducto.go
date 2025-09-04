@@ -2,6 +2,7 @@ package service
 
 import (
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/producto/dto"
 	"comercial-backend/src/modules/producto/model"
@@ -14,15 +15,15 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func ListarProductoService(filtros *structs.FiltrosProductoStruct, pagina int, limite int, ctx context.Context) ([]bson.M, error) {
+func ListarProductoService(filtros *structs.FiltrosProductoStruct, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
 	data, err := repository.ListarProductoRepository(filtros, pagina, limite, ctx)
 	if err != nil {
 
-		return []bson.M{}, err
+		return nil, err
 	}
 	if data == nil {
 
-		return []bson.M{}, nil
+		return nil, nil
 	}
 
 	return data, nil

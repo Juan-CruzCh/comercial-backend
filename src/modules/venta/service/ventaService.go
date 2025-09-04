@@ -6,7 +6,6 @@ import (
 	cajaRopository "comercial-backend/src/modules/caja/repository"
 	stockRopository "comercial-backend/src/modules/stock/repository"
 	"errors"
-	"fmt"
 	"strconv"
 
 	"comercial-backend/src/modules/venta/dto"
@@ -18,18 +17,31 @@ import (
 )
 
 func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bson.ObjectID, sucursalID *bson.ObjectID) (*bson.ObjectID, error) {
+	caja, err := cajaRopository.BuscarCajaUsuarioRepository(usuarioID, ctx)
+	if err != nil {
+		return nil, errors.New("Ocurrio un erro en la caja de venta " + err.Error())
+	}
 
 	fecha := utils.FechaHoraBolivia()
-	err := validaStockProduct(&body.DetalleVenta, ctx)
+	err = validaStockProduct(&body.DetalleVenta, ctx)
 	if err != nil {
 		return &bson.NilObjectID, err
 	}
 	cantidad, _ := repository.CountDocumentsVentaRepository(ctx)
-	var codigo string = "VEN-" + strconv.Itoa(int(cantidad))
 
+	var codigo string = "VEN-" + strconv.Itoa(int(cantidad))
+	var montoTotal float64 = 0
+	var sudTotal float64 = 0
+	for _, v := range body.DetalleVenta {
+		montoTotal += v.PrecioUnitario * float64(v.Cantidad)
+	}
+	for _, v := range body.DetalleVenta {
+		sudTotal += v.PrecioUnitario * float64(v.Cantidad)
+	}
+	montoTotal = montoTotal - *body.Descuento
 	var venta model.VentaModel = model.VentaModel{
 		Codigo:     codigo,
-		MontoTotal: body.MontoTotal,
+		MontoTotal: utils.RoundFloat(montoTotal, 2),
 		FechaVenta: fecha,
 		Fecha:      fecha,
 		Usuario:    *usuarioID,
@@ -38,28 +50,27 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		Estado:     enum.Realizada,
 		Flag:       enum.EstadoNuevo,
 		Descuento:  *body.Descuento,
-		SubTotal:   body.SudTotal,
+		SubTotal:   utils.RoundFloat(sudTotal, 2),
 	}
 	ventaID, err := repository.RealizarVentaRepository(&venta, ctx)
 	if err != nil {
-		return &bson.NilObjectID, err
-
+		return nil, err
 	}
-
 	for _, v := range body.DetalleVenta {
 		stockID, err := utils.ValidadIdMongo(v.Stock)
 		if err != nil {
-			return &bson.NilObjectID, err
+			return nil, err
 		}
 		stock, err := stockRopository.BuscarStockRepository(stockID, ctx)
 		if err != nil {
-			return &bson.NilObjectID, err
+			return nil, err
 		}
 		var nuevaCantidad int = stock.Cantidad - v.Cantidad
 		err = stockRopository.ActualizarStockRepository(stock.ID, nuevaCantidad, ctx)
 		if err != nil {
-			return &bson.NilObjectID, err
+			return nil, err
 		}
+		var precioTotalDetalle float64 = utils.RoundFloat(v.PrecioUnitario*float64(v.Cantidad), 2)
 		var detalleVenta model.DetalleVentaModel = model.DetalleVentaModel{
 			Producto:       stock.Producto,
 			Stock:          *stockID,
@@ -69,18 +80,14 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 			Fecha:          fecha,
 			Flag:           enum.EstadoNuevo,
 			PrecioUnitario: v.PrecioUnitario,
-			PrecioTotal:    v.PrecioTotal,
+			PrecioTotal:    precioTotalDetalle,
 		}
 		_ = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}
-	caja, err:= cajaRopository.BuscarCajaUsuarioRepository(usuarioID, ctx)
-	if err != nil {
-		return &bson.NilObjectID, errors.New("Ocurrio un erro en la caja de venta " + err.Error())
-	}
-	fmt.Println(caja.TotalVentas)
-	var totalVenta float64 = caja.TotalVentas + body.MontoTotal
-	var montoFinal float64 = totalVenta  + caja.MontoInicial
-	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal,ctx)
+
+	var totalVenta float64 = utils.RoundFloat(caja.TotalVentas+montoTotal, 2)
+	var montoFinal float64 = utils.RoundFloat(totalVenta+caja.MontoInicial, 2)
+	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal, ctx)
 
 	if err != nil {
 		return &bson.NilObjectID, errors.New("Ocurrio un error en la caja de venta al asignar el total vendido " + err.Error())

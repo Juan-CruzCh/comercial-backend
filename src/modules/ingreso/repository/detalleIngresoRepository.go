@@ -41,7 +41,7 @@ func ListarDetalleIngresoRepository(id *bson.ObjectID, ctx context.Context) (*[]
 				{Key: "fechaVencimiento", Value: 1},
 				{Key: "producto", Value: utils.ArrayElemAt("$producto.nombre", 0)},
 				{Key: "descripcion", Value: utils.ArrayElemAt("$producto.descripcion", 0)},
-				{Key: "codigo", Value: utils.ArrayElemAt("$producto.codigo", 0)},
+				{Key: "codigoStock", Value: 1},
 				{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre", 0)},
 				{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidaManejo.nombre", 0)},
 			}},
