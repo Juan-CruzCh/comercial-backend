@@ -4,14 +4,13 @@ import (
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/service"
+	structstock "comercial-backend/src/modules/stock/structStock"
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func RegitrarStockController(c *gin.Context) {
@@ -54,25 +53,16 @@ func ListarStockController(c *gin.Context) {
 	nombreProducto := c.Query("nombreProducto")
 	categoria := c.Query("categoria")
 	unidadManejo := c.Query("unidadManejo")
-	buscador := map[string]interface{}{}
-	if codigo != "" {
-		buscador["codigo"] = bson.Regex{Pattern: codigo, Options: "i"}
+	var buscador structstock.FiltrosStock = structstock.FiltrosStock {
+		Codigo: codigo,
+		ProductoNombre: nombreProducto,
+		Categoria: categoria,
+		UnidadManejo: unidadManejo,
 	}
-	if nombreProducto != "" {
-		buscador["nombre"] = bson.Regex{Pattern: nombreProducto, Options: "i"}
-	}
-	if categoria != "" {
-		buscador["categoria"] = categoria
-	}
-	if unidadManejo != "" {
-		buscador["unidadManejo"] = unidadManejo
-	}
-
-	fmt.Println("pagina", pagina, "limite", limite, "codig", buscador)
 
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 20*time.Second)
 	defer cancel()
-	resultado, err := service.ListarStockService(ctx)
+	resultado, err := service.ListarStockService(&buscador, pagina,limite,ctx)
 	if err != nil {
 
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

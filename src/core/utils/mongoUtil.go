@@ -1,6 +1,10 @@
 package utils
 
-import "go.mongodb.org/mongo-driver/v2/bson"
+import (
+	"math"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
+)
 
 func Lookup(from, localField, foreignField, as string) bson.D {
 	var pipelineMongo = bson.D{
@@ -35,4 +39,46 @@ func ArrayElemAt(arrayElemAtStage string, indice int) bson.D {
 		{Key: "$arrayElemAt", Value: bson.A{arrayElemAtStage, indice}},
 	}
 	return pipeline
+}
+
+func Regex(campo string, valor string) bson.D {
+	return bson.D{{
+		Key: campo,
+		Value: bson.D{
+			{Key: "$regex", Value: valor},
+			{Key: "$options", Value: "i"},
+		},
+	}}
+}
+func RegexMatch(campo string, valor string) bson.D {
+	return bson.D{{
+		Key: "$match",
+		Value: bson.D{{
+			Key: campo,
+			Value: bson.D{
+				{Key: "$regex", Value: valor},
+				{Key: "$options", Value: "i"},
+			},
+		}},
+	}}
+}
+
+func Match(campo string, valor *bson.ObjectID) bson.D {
+	return bson.D{{
+		Key: "$match",
+		Value: bson.D{{
+			Key:   campo,
+			Value: valor}},
+	}}
+}
+
+func Skip(pagina, limite int) int {
+	return (pagina - 1) * limite
+}
+
+func CalcularPaginas(total, limite int) int {
+	if limite <= 0 {
+		return 0 // evitar división por cero
+	}
+	return int(math.Ceil(float64(total) / float64(limite)))
 }

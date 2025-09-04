@@ -3,10 +3,13 @@ package repository
 import (
 	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/stock/model"
+	structstock "comercial-backend/src/modules/stock/structStock"
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -68,42 +71,71 @@ func BuscarStockRepository(stock *bson.ObjectID, ctx context.Context) (*model.St
 	return &stockModel, nil
 }
 
-func ListarStockRepository(ctx context.Context) (*[]bson.M, error) {
+func ListarStockRepository(filtros *structstock.FiltrosStock, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
 	collection := config.MongoDatabase.Collection(enum.Stock)
 	var pipeline mongo.Pipeline = mongo.Pipeline{
-		bson.D{
-			{Key: "$match", Value: bson.D{
-				{Key: "flag", Value: enum.EstadoNuevo},
-			}},
-		},
+		bson.D{{Key: "$match", Value: bson.D{{Key: "flag", Value: enum.EstadoNuevo}}}},
 		utils.Lookup("Producto", "producto", "_id", "producto"),
 		utils.Unwind("$producto", false),
 		utils.Lookup("Categoria", "producto.categoria", "_id", "categoria"),
 		utils.Lookup("UnidadManejo", "producto.unidadManejo", "_id", "unidadManejo"),
-		bson.D{
-			{Key: "$project", Value: bson.D{
-				{Key: "codigo", Value: 1},
-				{Key: "cantidad", Value: 1},
-				{Key: "precioUnitario", Value: 1},
-				{Key: "fechaVencimiento", Value: 1},
-				{Key: "descripcion", Value: "$producto.descripcion"},
-				{Key: "producto", Value: "$producto.nombre"},
-				{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre", 0)},
-				{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidadManejo.nombre", 0)},
-			},
-			},
-		},
 	}
+	if filtros.Codigo != "" {
+		pipeline = append(pipeline, utils.RegexMatch("codigo", filtros.Codigo))
+	}
+	fmt.Println(filtros.ProductoNombre)
+	if filtros.ProductoNombre != "" {
+		pipeline = append(pipeline, utils.RegexMatch("producto.nombre", filtros.ProductoNombre))
+	}
+	if filtros.Categoria != "" {
+		ID, err := utils.ValidadIdMongo(filtros.Categoria)
+		if err != nil {
+			return nil, err
+		}
+		pipeline = append(pipeline, utils.Match("producto.categoria", ID))
+	}
+	if filtros.UnidadManejo != "" {
+		ID, err := utils.ValidadIdMongo(filtros.UnidadManejo)
+		if err != nil {
+			return nil, err
+		}
+		pipeline = append(pipeline, utils.Match("producto.unidadManejo", ID))
+	}
+
+	pipeline = append(pipeline, bson.D{
+		{Key: "$project", Value: bson.D{
+			{Key: "codigo", Value: 1},
+			{Key: "cantidad", Value: 1},
+			{Key: "precioUnitario", Value: 1},
+			{Key: "fechaVencimiento", Value: 1},
+			{Key: "descripcion", Value: "$producto.descripcion"},
+			{Key: "producto", Value: "$producto.nombre"},
+			{Key: "categoria", Value: utils.ArrayElemAt("$categoria.nombre", 0)},
+			{Key: "unidadManejo", Value: utils.ArrayElemAt("$unidadManejo.nombre", 0)},
+		},
+		},
+	})
+	pipeline = append(pipeline, bson.D{{Key: "$skip", Value: utils.Skip(pagina, limite)}})
+	pipeline = append(pipeline, bson.D{{Key: "$limit", Value: limite}})
+	documentos, err := collection.CountDocuments(ctx, bson.M{"flag": enum.EstadoNuevo})
+	if err != nil {
+		return nil, err
+	}
+	var paginas int = utils.CalcularPaginas(int(documentos), limite)
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return &[]bson.M{}, err
+		return &structCore.ResultadoPaginado{}, err
 	}
 	defer cursor.Close(ctx)
 	var stock []bson.M
 	err = cursor.All(ctx, &stock)
 	if err != nil {
-		return &[]bson.M{}, err
+		return &structCore.ResultadoPaginado{}, err
+	}
+	var resultato structCore.ResultadoPaginado = structCore.ResultadoPaginado{
+		Data:    stock,
+		Paginas: paginas,
 	}
 
-	return &stock, nil
+	return &resultato, nil
 }

@@ -2,12 +2,14 @@ package service
 
 import (
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	coreUtil "comercial-backend/src/core/utils"
 	ingreso "comercial-backend/src/modules/ingreso/service"
 	productoRepository "comercial-backend/src/modules/producto/repository"
 	"comercial-backend/src/modules/stock/dto"
 	"comercial-backend/src/modules/stock/model"
 	repositoryStock "comercial-backend/src/modules/stock/repository"
+	structstock "comercial-backend/src/modules/stock/structStock"
 	"context"
 	"errors"
 	"strconv"
@@ -79,10 +81,10 @@ func RegitrarStockService(body *dto.IngresoStockData, ctx context.Context, usuar
 	return idIngreso, nil
 }
 
-func ListarStockService(ctx context.Context) (*[]bson.M, error) {
-	resultado, err := repositoryStock.ListarStockRepository(ctx)
+func ListarStockService(filtros *structstock.FiltrosStock, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	resultado, err := repositoryStock.ListarStockRepository(filtros, pagina, limite, ctx)
 	if err != nil {
-		return &[]bson.M{}, err
+		return &structCore.ResultadoPaginado{}, err
 	}
 	return resultado, nil
 }
