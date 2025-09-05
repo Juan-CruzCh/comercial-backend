@@ -73,7 +73,14 @@ func BuscarStockRepository(stock *bson.ObjectID, ctx context.Context) (*model.St
 func ListarStockRepository(filtros *structstock.FiltrosStock, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
 	collection := config.MongoDatabase.Collection(enum.Stock)
 	var pipeline mongo.Pipeline = mongo.Pipeline{
-		bson.D{{Key: "$match", Value: bson.D{{Key: "flag", Value: enum.EstadoNuevo}}}},
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "flag", Value: enum.EstadoNuevo},
+				{Key: "cantidad", Value: bson.D{
+					{Key: "$gt", Value: 0},
+				}},
+			}},
+		},
 		utils.Lookup("Producto", "producto", "_id", "producto"),
 		utils.Unwind("$producto", false),
 		utils.Lookup("Categoria", "producto.categoria", "_id", "categoria"),

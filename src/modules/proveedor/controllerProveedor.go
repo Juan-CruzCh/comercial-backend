@@ -1,6 +1,7 @@
 package proveedor
 
 import (
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/proveedor/dto"
 	"context"
 	"net/http"
@@ -28,9 +29,19 @@ func registrarProveedorController(c *gin.Context) {
 }
 
 func listarProveedorController(c *gin.Context) {
+	pagina, limite, err := utils.Paginador(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	nombre := c.Query("nombre")
+	ci := c.Query("ci")
+	celular := c.Query("celular")
+	empresa := c.Query("empresa")
+
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
-	data, err := listarProveedorService(ctx)
+	data, err := listarProveedorService(ci, nombre, celular, empresa, pagina, limite, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, err.Error())
 		return

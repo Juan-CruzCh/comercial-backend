@@ -2,13 +2,12 @@ package proveedor
 
 import (
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/modules/proveedor/dto"
 	"comercial-backend/src/modules/proveedor/model"
 	"comercial-backend/src/modules/proveedor/repository"
 	"context"
 	"time"
-
-	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func registrarProveedorService(proveedor *dto.ProveedorDto, ctx context.Context) error {
@@ -30,8 +29,8 @@ func registrarProveedorService(proveedor *dto.ProveedorDto, ctx context.Context)
 
 }
 
-func listarProveedorService(ctx context.Context) ([]bson.M, error) {
-	data, err := repository.ListarProveedorRepository(ctx)
+func listarProveedorService(ci string, nombre string, celular string, empresa string, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	data, err := repository.ListarProveedorRepository(ci, nombre, celular, empresa, pagina, limite, ctx)
 	if err != nil {
 		return nil, err
 	}
