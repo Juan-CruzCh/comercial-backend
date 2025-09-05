@@ -93,3 +93,20 @@ func ListarCajaUsuarioController(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 
 }
+
+func ListarCajaController(c *gin.Context) {
+	pagina, limite, err := utils.Paginador(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	data, err := service.ListarCaja(pagina, limite, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+
+}

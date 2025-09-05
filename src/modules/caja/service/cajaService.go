@@ -2,6 +2,7 @@ package service
 
 import (
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/caja/dto"
 	"comercial-backend/src/modules/caja/model"
@@ -64,4 +65,12 @@ func ListarCajaUsuarioService(usuario *bson.ObjectID, ctx context.Context) (*mod
 		return nil, err
 	}
 	return caja, nil
+}
+
+func ListarCaja(pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	data, err := repository.ListarCajaRespository(pagina, limite, ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	cajaRopository "comercial-backend/src/modules/caja/repository"
 	stockRopository "comercial-backend/src/modules/stock/repository"
@@ -111,10 +112,10 @@ func validaStockProduct(detalleVenta *[]dto.DetalleVenta, ctx context.Context) e
 
 }
 
-func ListarVentasRealizas(ctx context.Context) (*[]bson.M, error) {
-	resultado, err := repository.ListarVentasRepository(ctx)
+func ListarVentasRealizas(pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	resultado, err := repository.ListarVentasRepository(pagina, limite, ctx)
 	if err != nil {
-		return &[]bson.M{}, err
+		return nil, err
 	}
 	return resultado, nil
 }

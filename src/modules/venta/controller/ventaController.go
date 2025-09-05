@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"comercial-backend/src/core/utils"
 	coreUtils "comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/venta/dto"
 	"comercial-backend/src/modules/venta/service"
@@ -49,9 +50,14 @@ func RealizarVenta(c *gin.Context) {
 }
 
 func ListarVentasRealizas(c *gin.Context) {
+	pagina, limite, err := utils.Paginador(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
-	resultado, err := service.ListarVentasRealizas(ctx)
+	resultado, err := service.ListarVentasRealizas(pagina, limite, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

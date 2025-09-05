@@ -3,6 +3,7 @@ package repository
 import (
 	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
+	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/caja/model"
 	"context"
@@ -10,6 +11,7 @@ import (
 	"fmt"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 func AbrirCajaRepository(data *model.CajaModel, ctx context.Context) error {
@@ -73,7 +75,7 @@ func VerificarCajaRepository(usuario *bson.ObjectID, ctx context.Context) error 
 	if cantidad > 0 {
 		return nil
 	}
-	return errors.New("Debe abrir la caja")
+	return errors.New("debe abrir la caja")
 }
 
 func AsignarTotalVentasCajaRepository(usuario *bson.ObjectID, totalVenta float64, montoFinal float64, ctx context.Context) error {
@@ -86,4 +88,64 @@ func AsignarTotalVentasCajaRepository(usuario *bson.ObjectID, totalVenta float64
 		return err
 	}
 	return nil
+}
+
+func ListarCajaRespository(pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	collection := config.MongoDatabase.Collection(enum.Caja)
+	var pipeline mongo.Pipeline = mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "flag", Value: enum.EstadoNuevo},
+				{Key: "estado", Value: enum.Cerrado},
+			}},
+		},
+		utils.Lookup("Usuario", "usuario", "_id", "usuario"),
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "fechaApertura", Value: 1},
+				{Key: "montoInicial", Value: 1},
+				{Key: "montoFinal", Value: 1},
+				{Key: "totalVentas", Value: 1},
+				{Key: "estado", Value: 1},
+				{Key: "fechaCierre", Value: 1},
+				{Key: "usuario", Value: utils.ArrayElemAt("$usuario.username", 0)},
+			}},
+		},
+		bson.D{
+			{Key: "$skip", Value: utils.Skip(pagina, limite)},
+		},
+		bson.D{
+			{Key: "$limit", Value: limite},
+		},
+		bson.D{
+			{Key: "$sort", Value: bson.D{
+				{Key: "fechaCierre", Value: -1},
+			}},
+		},
+	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
+
+	if err != nil {
+		return nil, err
+	}
+	cantidad, err := collection.CountDocuments(ctx, bson.D{
+		{Key: "flag", Value: enum.EstadoNuevo},
+		{Key: "estado", Value: enum.Cerrado},
+	})
+	if err != nil {
+		return nil, err
+	}
+	var paginas int = utils.CalcularPaginas(int(cantidad), limite)
+	var data []bson.M
+	defer cursor.Close(ctx)
+	err = cursor.All(ctx, &data)
+	if err != nil {
+		return nil, err
+	}
+	var resultado structCore.ResultadoPaginado = structCore.ResultadoPaginado{
+		Data:    data,
+		Paginas: paginas,
+	}
+	return &resultado, nil
+
 }
