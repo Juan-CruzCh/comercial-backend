@@ -119,3 +119,12 @@ func ListarVentasRealizas(pagina int, limite int, ctx context.Context) (*structC
 	}
 	return resultado, nil
 }
+
+func BuscarVentaPorIdService(idVenta *bson.ObjectID, ctx context.Context) (*bson.M, error) {
+	data, err := repository.BuscarVentaPorIdRespository(idVenta, ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+
+}

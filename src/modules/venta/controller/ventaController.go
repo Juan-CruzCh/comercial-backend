@@ -64,3 +64,21 @@ func ListarVentasRealizas(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, resultado)
 }
+
+func BuscarVentaPorIdController(c *gin.Context) {
+	idVenta := c.Param("id")
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	ID, err := utils.ValidadIdMongo(idVenta)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	data, err := service.BuscarVentaPorIdService(ID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+
+}

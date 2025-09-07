@@ -21,7 +21,7 @@ func RealizarVentaRepository(venta *model.VentaModel, ctx context.Context) (*bso
 	}
 	ventaID, ok := resultado.InsertedID.(bson.ObjectID)
 	if !ok {
-		return &bson.NilObjectID, errors.New("Se prodcuto un erro al ingresa la venta")
+		return &bson.NilObjectID, errors.New("se prodcuto un erro al ingresa la venta")
 	}
 
 	return &ventaID, nil
@@ -94,5 +94,42 @@ func ListarVentasRepository(pagina int, limite int, ctx context.Context) (*struc
 		Paginas: paginas,
 	}
 	return &resultado, nil
+
+}
+func BuscarVentaPorIdRespository(idVenta *bson.ObjectID, ctx context.Context) (*bson.M, error) {
+	collection := config.MongoDatabase.Collection(enum.Venta)
+	var pipeline mongo.Pipeline = mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "_id", Value: idVenta},
+			}},
+		},
+		utils.Lookup("DetalleVenta", "_id", "venta", "detalleVenta"),
+		utils.Lookup("Usuario", "usuario", "_id", "usuario"),
+		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "codigo", Value: 1},
+				{Key: "usuario", Value: utils.ArrayElemAt("$usuario.username", 0)},
+				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
+				{Key: "detalleVenta", Value: 1},
+				{Key: "fechaVenta", Value: 1},
+				{Key: "montoTotal", Value: 1},
+				{Key: "descuento", Value: 1},
+				{Key: "subTotal", Value: 1},
+			}},
+		},
+	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var resultado []bson.M
+	err = cursor.All(ctx, &resultado)
+	if err != nil {
+		return nil, err
+	}
+	return &resultado[0], nil
 
 }

@@ -14,11 +14,9 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func AbriCajaService(body *dto.CajaDto, ctx context.Context, usuarioID *bson.ObjectID) error {
+func AbriCajaService(body *dto.CajaDto, ctx context.Context, usuarioID *bson.ObjectID, sucursalID *bson.ObjectID) error {
 	fecha := utils.FechaHoraBolivia()
-
 	err := repository.VerificarCajaAbierto(usuarioID, ctx)
-
 	if err != nil {
 		return err
 	}
@@ -29,6 +27,7 @@ func AbriCajaService(body *dto.CajaDto, ctx context.Context, usuarioID *bson.Obj
 		Flag:          enum.EstadoNuevo,
 		Estado:        enum.Abierto,
 		Fecha:         fecha,
+		Sucursal:      *sucursalID,
 	}
 	err = repository.AbrirCajaRepository(&model, ctx)
 	if err != nil {

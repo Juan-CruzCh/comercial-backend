@@ -13,7 +13,7 @@ import (
 )
 
 func AbriCajaController(c *gin.Context) {
-	usuarioID, _, err := utils.Request(c)
+	usuarioID, sucursalID, err := utils.Request(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -33,7 +33,7 @@ func AbriCajaController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err = service.AbriCajaService(&body, ctx, usuarioID)
+	err = service.AbriCajaService(&body, ctx, usuarioID, sucursalID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -17,6 +17,7 @@ type CajaModel struct {
 	Egresos       float64       `bson:"egresos"`
 	Estado        enum.CajaEnum `bson:"estado"`
 	Usuario       bson.ObjectID `bson:"usuario"`
+	Sucursal      bson.ObjectID `bson:"sucursal"`
 	Fecha         time.Time     `bson:"fecha"`
 	Flag          enum.Estado   `bson:"flag"`
 }
