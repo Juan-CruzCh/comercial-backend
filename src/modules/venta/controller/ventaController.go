@@ -50,6 +50,7 @@ func RealizarVenta(c *gin.Context) {
 }
 
 func ListarVentasRealizas(c *gin.Context) {
+	validate := validator.New()
 	pagina, limite, err := utils.Paginador(c)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -57,7 +58,19 @@ func ListarVentasRealizas(c *gin.Context) {
 	}
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
-	resultado, err := service.ListarVentasRealizas(pagina, limite, ctx)
+	var body dto.BuscadorVentaDto
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = validate.Struct(body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resultado, err := service.ListarVentasRealizas(&body, pagina, limite, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

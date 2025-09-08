@@ -8,6 +8,6 @@ import (
 
 func VentaRouter(router *gin.RouterGroup) {
 	router.POST("/venta", controller.RealizarVenta)
-	router.GET("/venta", controller.ListarVentasRealizas)
+	router.POST("/venta/listar", controller.ListarVentasRealizas)
 	router.GET("/buscar/ventaId/:id", controller.BuscarVentaPorIdController)
 }

@@ -5,6 +5,7 @@ import (
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
+	"comercial-backend/src/modules/venta/dto"
 	"comercial-backend/src/modules/venta/model"
 	"context"
 	"errors"
@@ -37,7 +38,7 @@ func CountDocumentsVentaRepository(ctx context.Context) (int64, error) {
 	return countDocuments, nil
 }
 
-func ListarVentasRepository(pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+func ListarVentasRepository(filtros *dto.BuscadorVentaDto, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
 	collection := config.MongoDatabase.Collection(enum.Venta)
 	var pipeline mongo.Pipeline = mongo.Pipeline{
 		bson.D{
@@ -47,30 +48,71 @@ func ListarVentasRepository(pagina int, limite int, ctx context.Context) (*struc
 		},
 		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
 		utils.Lookup("Usuario", "usuario", "_id", "usuario"),
-		bson.D{
-			{Key: "$project", Value: bson.D{
-				{Key: "codigo", Value: 1},
-				{Key: "montoTotal", Value: 1},
-				{Key: "subTotal", Value: 1},
-				{Key: "fechaVenta", Value: 1},
-				{Key: "descuento", Value: 1},
-				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
-				{Key: "vendedor", Value: utils.ArrayElemAt("$usuario.username", 0)},
+	}
+	if filtros.Codigo != "" {
+		pipeline = append(pipeline, utils.RegexMatch("codigo", filtros.Codigo))
+	}
+	if filtros.FechaFin != "" && filtros.FechaInicio != "" {
+		f1, f2, err := utils.NormalizarRangoDeFechas(filtros.FechaInicio, filtros.FechaFin)
+		if err != nil {
+			return nil, err
+		}
+		pipeline = append(pipeline, bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "fechaVenta", Value: bson.D{
+					{Key: "$gte", Value: f1},
+					{Key: "$lte", Value: f2},
+				}},
 			}},
-		},
-		bson.D{
-			{Key: "$sort", Value: bson.D{
-				{Key: "fechaVenta", Value: -1},
+		})
+	}
+	if filtros.Sucursal != "" {
+		ID, err := utils.ValidadIdMongo(filtros.Sucursal)
+		if err != nil {
+			return nil, err
+		}
+		pipeline = append(pipeline, bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "sucursal._id", Value: ID},
 			}},
-		},
+		})
+	}
+	if filtros.Usuario != "" {
+		ID, err := utils.ValidadIdMongo(filtros.Usuario)
+		if err != nil {
+			return nil, err
+		}
+		pipeline = append(pipeline, bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "usuario._id", Value: ID},
+			}},
+		})
+	}
 
-		bson.D{
-			{Key: "$skip", Value: utils.Skip(pagina, limite)},
-		},
+	pipeline = append(pipeline, bson.D{
+		{Key: "$project", Value: bson.D{
+			{Key: "codigo", Value: 1},
+			{Key: "montoTotal", Value: 1},
+			{Key: "subTotal", Value: 1},
+			{Key: "fechaVenta", Value: 1},
+			{Key: "descuento", Value: 1},
+			{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
+			{Key: "vendedor", Value: utils.ArrayElemAt("$usuario.username", 0)},
+		}},
+	})
+	pipeline = append(pipeline, bson.D{
+		{Key: "$sort", Value: bson.D{
+			{Key: "fechaVenta", Value: -1},
+		}},
+	})
+	pipeline = append(pipeline, bson.D{
+		{Key: "$skip", Value: utils.Skip(pagina, limite)},
+	})
+	pipeline = append(pipeline,
 		bson.D{
 			{Key: "$limit", Value: limite},
 		},
-	}
+	)
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 

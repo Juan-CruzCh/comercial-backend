@@ -11,3 +11,11 @@ type DetalleVenta struct {
 	PrecioUnitario      float64 `json:"precioUnitario" binding:"required,gte=0"`
 	DescripcionProducto string  `json:"descripcionProducto" binding:"required"`
 }
+
+type BuscadorVentaDto struct {
+	Codigo      string `json:"codigo"`
+	Sucursal    string `json:"sucursal"`
+	Usuario     string `json:"usuario"`
+	FechaInicio string `json:"fechaInicio"`
+	FechaFin    string `json:"fechaFin"`
+}

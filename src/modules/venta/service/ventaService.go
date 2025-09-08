@@ -112,8 +112,8 @@ func validaStockProduct(detalleVenta *[]dto.DetalleVenta, ctx context.Context) e
 
 }
 
-func ListarVentasRealizas(pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
-	resultado, err := repository.ListarVentasRepository(pagina, limite, ctx)
+func ListarVentasRealizas(filtros *dto.BuscadorVentaDto, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	resultado, err := repository.ListarVentasRepository(filtros, pagina, limite, ctx)
 	if err != nil {
 		return nil, err
 	}
