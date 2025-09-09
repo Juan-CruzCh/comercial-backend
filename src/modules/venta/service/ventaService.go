@@ -42,7 +42,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		sudTotal += v.PrecioUnitario * float64(v.Cantidad)
 	}
 	montoTotal = montoTotal - *body.Descuento
-	realizarDescuentoVenta(sucursalID, &montoTotal, ctx)
+	realizarDescuentoVenta(sucursalID, montoTotal, ctx)
 	var venta model.VentaModel = model.VentaModel{
 		Codigo:     codigo,
 		MontoTotal: utils.RoundFloat(montoTotal, 2),
@@ -99,16 +99,18 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	return ventaID, nil
 
 }
-func realizarDescuentoVenta(sucursal *bson.ObjectID, total *float64, ctx context.Context) (float64, float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
+func realizarDescuentoVenta(sucursal *bson.ObjectID, total float64, ctx context.Context) (float64, float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
 	var alquiler float64 = 0
 	var vendedor float64 = 0
+	var totalGanancia float64 = 0
 	data, err := descuentoVentaRepository.ObtenerDescuentoVentaRepository(sucursal, ctx)
 	if err != nil {
 		return alquiler, vendedor
 	}
 	var porcentajeAlquiler float64 = utils.Porcentaje(data.Alquiler)
 	var porcentajeVendedor float64 = utils.Porcentaje(data.Vendedor)
-	fmt.Println(alquiler, vendedor, porcentajeAlquiler, porcentajeVendedor)
+	var totalSinAlquiler float64 = total * (1 - porcentajeAlquiler/100)
+	fmt.Println(alquiler, vendedor, porcentajeAlquiler, porcentajeVendedor, totalSinAlquiler, totalGanancia)
 	return alquiler, vendedor
 }
 
