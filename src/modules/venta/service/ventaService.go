@@ -5,8 +5,10 @@ import (
 	"comercial-backend/src/core/structCore"
 	"comercial-backend/src/core/utils"
 	cajaRopository "comercial-backend/src/modules/caja/repository"
+	descuentoVentaRepository "comercial-backend/src/modules/descuentoVenta/repository"
 	stockRopository "comercial-backend/src/modules/stock/repository"
 	"errors"
+	"fmt"
 	"strconv"
 
 	"comercial-backend/src/modules/venta/dto"
@@ -24,7 +26,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	}
 
 	fecha := utils.FechaHoraBolivia()
-	err = validaStockProduct(&body.DetalleVenta, ctx)
+	err = validaStockProducto(&body.DetalleVenta, ctx)
 	if err != nil {
 		return &bson.NilObjectID, err
 	}
@@ -40,6 +42,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		sudTotal += v.PrecioUnitario * float64(v.Cantidad)
 	}
 	montoTotal = montoTotal - *body.Descuento
+	realizarDescuentoVenta(sucursalID, &montoTotal, ctx)
 	var venta model.VentaModel = model.VentaModel{
 		Codigo:     codigo,
 		MontoTotal: utils.RoundFloat(montoTotal, 2),
@@ -96,8 +99,20 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	return ventaID, nil
 
 }
+func realizarDescuentoVenta(sucursal *bson.ObjectID, total *float64, ctx context.Context) (float64, float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
+	var alquiler float64 = 0
+	var vendedor float64 = 0
+	data, err := descuentoVentaRepository.ObtenerDescuentoVentaRepository(sucursal, ctx)
+	if err != nil {
+		return alquiler, vendedor
+	}
+	var porcentajeAlquiler float64 = utils.Porcentaje(data.Alquiler)
+	var porcentajeVendedor float64 = utils.Porcentaje(data.Vendedor)
+	fmt.Println(alquiler, vendedor, porcentajeAlquiler, porcentajeVendedor)
+	return alquiler, vendedor
+}
 
-func validaStockProduct(detalleVenta *[]dto.DetalleVenta, ctx context.Context) error {
+func validaStockProducto(detalleVenta *[]dto.DetalleVenta, ctx context.Context) error {
 	for _, v := range *detalleVenta {
 		stockID, _ := utils.ValidadIdMongo(v.Stock)
 		stock, err := stockRopository.BuscarStockRepository(stockID, ctx)
@@ -126,5 +141,4 @@ func BuscarVentaPorIdService(idVenta *bson.ObjectID, ctx context.Context) (*bson
 		return nil, err
 	}
 	return data, nil
-
 }

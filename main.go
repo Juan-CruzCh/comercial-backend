@@ -9,6 +9,7 @@ import (
 
 	autenticacionRouter "comercial-backend/src/modules/autenticacion/router"
 	cajaRouter "comercial-backend/src/modules/caja/router"
+	DescuentoVentaRouter "comercial-backend/src/modules/descuentoVenta/router"
 	ingresoRouter "comercial-backend/src/modules/ingreso/router"
 	"comercial-backend/src/modules/proveedor"
 	routerStock "comercial-backend/src/modules/stock/router"
@@ -20,8 +21,8 @@ import (
 )
 
 func main() {
-	//var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
-	var url string = "mongodb://localhost:27017"
+	var url string = "mongodb://kanna:kanna@localhost:27017/comision?authSource=admin"
+	//var url string = "mongodb://localhost:27017"
 	config.ConnectMongo(url, "ventas")
 
 	/*ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -43,9 +44,7 @@ func main() {
 	}))
 
 	api := router.Group("api")
-
 	autenticacionRouter.AutenticacionRouter(api)
-
 	api.Use(middleware.ValidarTokenAtenticacion())
 	categoria.RouterCategoria(api)
 	proveedor.RouterProveedor(api)
@@ -58,6 +57,7 @@ func main() {
 	sucursalRouter.SucursalRouter(api)
 	ingresoRouter.IngresoRouter(api)
 	ingresoRouter.DetalleIngresoRouter(api)
+	DescuentoVentaRouter.DescuentoVentaRouter(api)
 	//almacen.AlmacenRouter(api)
 	router.Run(":3000")
 }
