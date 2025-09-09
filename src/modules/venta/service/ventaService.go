@@ -8,7 +8,6 @@ import (
 	descuentoVentaRepository "comercial-backend/src/modules/descuentoVenta/repository"
 	stockRopository "comercial-backend/src/modules/stock/repository"
 	"errors"
-	"fmt"
 	"strconv"
 
 	"comercial-backend/src/modules/venta/dto"
@@ -42,19 +41,23 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		sudTotal += v.PrecioUnitario * float64(v.Cantidad)
 	}
 	montoTotal = montoTotal - *body.Descuento
-	realizarDescuentoVenta(sucursalID, montoTotal, ctx)
+	alquiler, vendedor, ganancia, descuentoAcumulado := realizarDescuentoVenta(sucursalID, montoTotal, ctx)
 	var venta model.VentaModel = model.VentaModel{
-		Codigo:     codigo,
-		MontoTotal: utils.RoundFloat(montoTotal, 2),
-		FechaVenta: fecha,
-		Fecha:      fecha,
-		Usuario:    *usuarioID,
-		Sucursal:   *sucursalID,
-		TipoPago:   enum.Efectivo,
-		Estado:     enum.Realizada,
-		Flag:       enum.EstadoNuevo,
-		Descuento:  *body.Descuento,
-		SubTotal:   utils.RoundFloat(sudTotal, 2),
+		Codigo:             codigo,
+		MontoTotal:         utils.RoundFloat(montoTotal, 2),
+		FechaVenta:         fecha,
+		Fecha:              fecha,
+		Usuario:            *usuarioID,
+		Sucursal:           *sucursalID,
+		TipoPago:           enum.Efectivo,
+		Estado:             enum.Realizada,
+		Flag:               enum.EstadoNuevo,
+		Descuento:          *body.Descuento,
+		DescuentoAlquiller: alquiler,
+		DescuentoVendedor:  vendedor,
+		TotalGanancia:      ganancia,
+		DescuentoAcumulado: descuentoAcumulado,
+		SubTotal:           utils.RoundFloat(sudTotal, 2),
 	}
 	ventaID, err := repository.RealizarVentaRepository(&venta, ctx)
 	if err != nil {
@@ -99,19 +102,26 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	return ventaID, nil
 
 }
-func realizarDescuentoVenta(sucursal *bson.ObjectID, total float64, ctx context.Context) (float64, float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
+func realizarDescuentoVenta(sucursal *bson.ObjectID, total float64, ctx context.Context) (al float64, ven float64, ganacia float64, totalDescuento float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
 	var alquiler float64 = 0
 	var vendedor float64 = 0
-	var totalGanancia float64 = 0
+
 	data, err := descuentoVentaRepository.ObtenerDescuentoVentaRepository(sucursal, ctx)
 	if err != nil {
-		return alquiler, vendedor
+		return 0, 0, total, 0
 	}
+
 	var porcentajeAlquiler float64 = utils.Porcentaje(data.Alquiler)
 	var porcentajeVendedor float64 = utils.Porcentaje(data.Vendedor)
-	var totalSinAlquiler float64 = total * (1 - porcentajeAlquiler/100)
-	fmt.Println(alquiler, vendedor, porcentajeAlquiler, porcentajeVendedor, totalSinAlquiler, totalGanancia)
-	return alquiler, vendedor
+	alquiler = (porcentajeAlquiler / 100) * total //se extrae la en plara el porcentaje
+	vendedor = (porcentajeVendedor / 100) * total //se extrae la en plara el porcentaje
+	alquiler = utils.RoundFloat(alquiler, 2)
+	vendedor = utils.RoundFloat(vendedor, 2)
+	var descuentoAcumulado float64 = alquiler + vendedor
+	var totalGanancia float64 = total - descuentoAcumulado
+	totalGanancia = utils.RoundFloat(totalGanancia, 2)
+
+	return alquiler, vendedor, totalGanancia, descuentoAcumulado
 }
 
 func validaStockProducto(detalleVenta *[]dto.DetalleVenta, ctx context.Context) error {

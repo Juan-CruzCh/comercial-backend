@@ -22,5 +22,6 @@ type VentaModel struct {
 	Sucursal           bson.ObjectID    `bson:"sucursal"`
 	DescuentoAlquiller float64          `bson:"descuentoAlquiller"`
 	DescuentoVendedor  float64          `bson:"descuentoVendedor"`
+	DescuentoAcumulado float64          `bson:"descuentoAcumulado"`
 	TotalGanancia      float64          `bson:"totalGanancia"`
 }
