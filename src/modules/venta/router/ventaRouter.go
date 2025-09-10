@@ -10,4 +10,5 @@ func VentaRouter(router *gin.RouterGroup) {
 	router.POST("/venta", controller.RealizarVenta)
 	router.POST("/venta/listar", controller.ListarVentasRealizas)
 	router.GET("/buscar/ventaId/:id", controller.BuscarVentaPorIdController)
+	router.POST("/reporte/ventas", controller.ReporteVentasController)
 }

@@ -8,6 +8,8 @@ import (
 	"comercial-backend/src/modules/descuentoVenta/model"
 	"comercial-backend/src/modules/descuentoVenta/repository"
 	"context"
+
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func CrearDescuentoVentaService(body *dto.DescuentoVentaDto, ctx context.Context) error {
@@ -25,4 +27,12 @@ func CrearDescuentoVentaService(body *dto.DescuentoVentaDto, ctx context.Context
 		return err
 	}
 	return nil
+}
+
+func ListarDescuentoVentaService(ctx context.Context) (*[]bson.M, error) {
+	data, err := repository.ListarDescuentoVentaRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }

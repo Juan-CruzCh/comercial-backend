@@ -5,7 +5,6 @@ import (
 	"comercial-backend/src/modules/usuario/dto"
 	"comercial-backend/src/modules/usuario/service"
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -86,7 +85,7 @@ func CerrarAuntenticacionUsuarioController(c *gin.Context) {
 }
 func VerificarAutenticacionUsuarioController(c *gin.Context) {
 	_, existe := c.Get("usuario")
-	fmt.Println(existe)
+
 	if !existe {
 		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
 		return

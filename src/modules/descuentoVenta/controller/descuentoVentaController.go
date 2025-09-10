@@ -33,3 +33,15 @@ func CrearDescuentoVentaController(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{"status": http.StatusCreated})
 }
+
+func ListarDescuentoVentaController(c *gin.Context) {
+
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	data, err := service.ListarDescuentoVentaService(ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, data)
+}

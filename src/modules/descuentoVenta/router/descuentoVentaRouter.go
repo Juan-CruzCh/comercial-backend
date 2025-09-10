@@ -8,4 +8,5 @@ import (
 
 func DescuentoVentaRouter(router *gin.RouterGroup) {
 	router.POST("/descuento/venta", controller.CrearDescuentoVentaController)
+	router.GET("/descuento/venta", controller.ListarDescuentoVentaController)
 }

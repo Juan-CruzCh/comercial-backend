@@ -95,3 +95,15 @@ func BuscarVentaPorIdController(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 
 }
+
+func ReporteVentasController(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	data, err := service.ReporteVentasService(ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+
+}

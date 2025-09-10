@@ -154,3 +154,11 @@ func BuscarVentaPorIdService(idVenta *bson.ObjectID, ctx context.Context) (*bson
 	}
 	return data, nil
 }
+
+func ReporteVentasService(ctx context.Context) (*[]bson.M, error) {
+	data, err := repository.ReporteVentasRepository(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
