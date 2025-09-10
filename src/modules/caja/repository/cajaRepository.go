@@ -100,6 +100,7 @@ func ListarCajaRespository(pagina int, limite int, ctx context.Context) (*struct
 			}},
 		},
 		utils.Lookup("Usuario", "usuario", "_id", "usuario"),
+		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
 		bson.D{
 			{Key: "$project", Value: bson.D{
 				{Key: "fechaApertura", Value: 1},
@@ -109,6 +110,7 @@ func ListarCajaRespository(pagina int, limite int, ctx context.Context) (*struct
 				{Key: "estado", Value: 1},
 				{Key: "fechaCierre", Value: 1},
 				{Key: "usuario", Value: utils.ArrayElemAt("$usuario.username", 0)},
+				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
 			}},
 		},
 		bson.D{

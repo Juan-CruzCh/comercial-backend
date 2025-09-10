@@ -44,14 +44,24 @@ func ListarIngresoRepository(ctx context.Context) (*[]bson.M, error) {
 		},
 
 		utils.Lookup("Proveedor", "proveedor", "_id", "proveedor"),
+		utils.Lookup("Usuario", "usuario", "_id", "usuario"),
 
 		bson.D{
 			{Key: "$project", Value: bson.D{
 				{Key: "codigo", Value: 1},
 				{Key: "fecha", Value: 1},
 				{Key: "factura", Value: 1},
+				{Key: "montoTotal", Value: 1},
+				{Key: "totalDescuento", Value: 1},
+				{Key: "sudTotal", Value: 1},
 				{Key: "proveedorNombre", Value: utils.ArrayElemAt("$proveedor.nombre", 0)},
 				{Key: "proveedorApoellido", Value: utils.ArrayElemAt("$proveedor.apellidos", 0)},
+				{Key: "usuario", Value: utils.ArrayElemAt("$usuario.username", 0)},
+			}},
+		},
+		bson.D{
+			{Key: "$sort", Value: bson.D{
+				{Key: "fecha", Value: -1},
 			}},
 		},
 	}

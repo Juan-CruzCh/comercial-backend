@@ -21,15 +21,26 @@ func RegistrarIngresoStockService(body *dto.IngresoStockDto, ctx context.Context
 	if err != nil {
 		return &bson.NilObjectID, err
 	}
+	var montoTotal float64 = 0
+	var subTotal float64 = 0
+	var descuento float64 = 0
+	for _, v := range body.Stock {
+		montoTotal += v.MontoTotal
+		subTotal += v.SudTotal
+		descuento += v.Descuento
+	}
+
 	var codigo string = "IGR-" + strconv.Itoa(int(documento))
 	var ingreso = model.IngresoModel{
-		Codigo:     codigo,
-		Fecha:      fecha,
-		Proveedor:  *ProveedorID,
-		Factura:    body.Factura,
-		MontoTotal: body.MontoTotal,
-		Flag:       enum.EstadoNuevo,
-		Usuario:    *usuario,
+		Codigo:         codigo,
+		Fecha:          fecha,
+		Proveedor:      *ProveedorID,
+		Factura:        body.Factura,
+		MontoTotal:     montoTotal,
+		TotalDescuento: descuento,
+		Flag:           enum.EstadoNuevo,
+		Usuario:        *usuario,
+		SudTotal:       subTotal,
 	}
 	ingresoID, err := ingresoRepository.CrearIngresoRepository(&ingreso, ctx)
 	if err != nil {
