@@ -50,8 +50,12 @@ func ListarUsuarioService(ctx context.Context) (*[]bson.M, error) {
 	return data, nil
 }
 
-func obtenerUsuarioService(id string, ctx context.Context) {
-
+func ObtenerUsuarioIdService(id *bson.ObjectID, ctx context.Context) (*bson.M, error) {
+	data, err := repository.BuscarUsuarioIdRepository(id, ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }
 func actualizarUsuarioService(id string, u *dto.UsuarioDto, ctx context.Context) {
 

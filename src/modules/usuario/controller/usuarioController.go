@@ -84,12 +84,27 @@ func CerrarAuntenticacionUsuarioController(c *gin.Context) {
 
 }
 func VerificarAutenticacionUsuarioController(c *gin.Context) {
-	_, existe := c.Get("usuario")
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	id, existe := c.Get("usuario")
 
 	if !existe {
 		c.JSON(http.StatusForbidden, gin.H{"status": http.StatusForbidden})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+	idStr, ok := id.(string)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error al convertir el ID a string"})
+		return
+	}
+	ID, err := utils.ValidadIdMongo(idStr)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error  el ID a Mongo"})
+	}
+	data, err := service.ObtenerUsuarioIdService(ID, ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error  al obtener el usuario"})
+	}
+	c.JSON(http.StatusOK, data)
 
 }

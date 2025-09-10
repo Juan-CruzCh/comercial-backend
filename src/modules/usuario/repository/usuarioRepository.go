@@ -82,3 +82,35 @@ func EliminarUsuarioRepository(id *bson.ObjectID, ctx context.Context) error {
 	}
 	return nil
 }
+
+func BuscarUsuarioIdRepository(id *bson.ObjectID, ctx context.Context) (*bson.M, error) {
+	collection := config.MongoDatabase.Collection(enum.Usuario)
+	var resultado []bson.M
+
+	var pipeline mongo.Pipeline = mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "_id", Value: id},
+				{Key: "flag", Value: enum.EstadoNuevo},
+			}},
+		},
+		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
+		bson.D{
+			{Key: "$project", Value: bson.D{
+
+				{Key: "nombre", Value: 1},
+				{Key: "apellidos", Value: 1},
+				{Key: "rol", Value: 1},
+				{Key: "username", Value: 1},
+				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
+			}},
+		},
+	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	cursor.All(ctx, &resultado)
+	return &resultado[0], nil
+}
