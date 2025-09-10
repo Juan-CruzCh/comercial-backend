@@ -97,9 +97,23 @@ func BuscarVentaPorIdController(c *gin.Context) {
 }
 
 func ReporteVentasController(c *gin.Context) {
+	validate := validator.New()
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
-	data, err := service.ReporteVentasService(ctx)
+
+	var body dto.BuscadorVentaDto
+	err := c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = validate.Struct(body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	data, err := service.ReporteVentasService(&body, ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

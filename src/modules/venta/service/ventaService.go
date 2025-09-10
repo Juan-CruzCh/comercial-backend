@@ -140,7 +140,7 @@ func validaStockProducto(detalleVenta *[]dto.DetalleVenta, ctx context.Context) 
 }
 
 func ListarVentasRealizas(filtros *dto.BuscadorVentaDto, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
-	resultado, err := repository.ListarVentasRepository(filtros, pagina, limite, ctx)
+	resultado, err := repository.ListarVentasRepository(filtros, pagina, limite, true, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -155,8 +155,8 @@ func BuscarVentaPorIdService(idVenta *bson.ObjectID, ctx context.Context) (*bson
 	return data, nil
 }
 
-func ReporteVentasService(ctx context.Context) (*[]bson.M, error) {
-	data, err := repository.ReporteVentasRepository(ctx)
+func ReporteVentasService(filtros *dto.BuscadorVentaDto, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+	data, err := repository.ListarVentasRepository(filtros, 0, 0, false, ctx)
 	if err != nil {
 		return nil, err
 	}

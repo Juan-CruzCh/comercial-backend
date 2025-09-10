@@ -9,7 +9,6 @@ import (
 	"comercial-backend/src/modules/venta/model"
 	"context"
 	"errors"
-	"fmt"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -39,7 +38,7 @@ func CountDocumentsVentaRepository(ctx context.Context) (int64, error) {
 	return countDocuments, nil
 }
 
-func ListarVentasRepository(filtros *dto.BuscadorVentaDto, pagina int, limite int, ctx context.Context) (*structCore.ResultadoPaginado, error) {
+func ListarVentasRepository(filtros *dto.BuscadorVentaDto, pagina int, limite int, halibitarPaginador bool, ctx context.Context) (*structCore.ResultadoPaginado, error) {
 	collection := config.MongoDatabase.Collection(enum.Venta)
 	var pipeline mongo.Pipeline = mongo.Pipeline{
 		bson.D{
@@ -97,6 +96,10 @@ func ListarVentasRepository(filtros *dto.BuscadorVentaDto, pagina int, limite in
 			{Key: "subTotal", Value: 1},
 			{Key: "fechaVenta", Value: 1},
 			{Key: "descuento", Value: 1},
+			{Key: "descuentoAlquiller", Value: 1},
+			{Key: "descuentoVendedor", Value: 1},
+			{Key: "descuentoAcumulado", Value: 1},
+			{Key: "totalGanancia", Value: 1},
 			{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
 			{Key: "vendedor", Value: utils.ArrayElemAt("$usuario.username", 0)},
 		}},
@@ -106,14 +109,17 @@ func ListarVentasRepository(filtros *dto.BuscadorVentaDto, pagina int, limite in
 			{Key: "fechaVenta", Value: -1},
 		}},
 	})
-	pipeline = append(pipeline, bson.D{
-		{Key: "$skip", Value: utils.Skip(pagina, limite)},
-	})
-	pipeline = append(pipeline,
-		bson.D{
-			{Key: "$limit", Value: limite},
-		},
-	)
+	if halibitarPaginador {
+		pipeline = append(pipeline, bson.D{
+			{Key: "$skip", Value: utils.Skip(pagina, limite)},
+		})
+		pipeline = append(pipeline,
+			bson.D{
+				{Key: "$limit", Value: limite},
+			},
+		)
+
+	}
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 
@@ -175,65 +181,4 @@ func BuscarVentaPorIdRespository(idVenta *bson.ObjectID, ctx context.Context) (*
 	}
 	return &resultado[0], nil
 
-}
-func ReporteVentasRepository(ctx context.Context) (*[]bson.M, error) {
-	collection := config.MongoDatabase.Collection(enum.Venta)
-	var pipeline mongo.Pipeline = mongo.Pipeline{
-		bson.D{
-			{Key: "$match", Value: bson.D{
-				{Key: "flag", Value: enum.EstadoNuevo},
-			}},
-		},
-		utils.Lookup("Usuario", "usuario", "_id", "usuario"),
-		utils.Unwind("$usuario", false),
-		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
-		utils.Unwind("$sucursal", false),
-		bson.D{
-			{Key: "$group", Value: bson.D{
-				{Key: "_id", Value: "$usuario._id"},
-				{Key: "montoTotal", Value: bson.D{
-					{Key: "$sum", Value: "$montoTotal"},
-				}},
-				{Key: "descuentoAcumulado", Value: bson.D{
-					{Key: "$sum", Value: "$descuentoAcumulado"},
-				}},
-				{Key: "totalGanancia", Value: bson.D{
-					{Key: "$sum", Value: "$totalGanancia"},
-				}},
-				{Key: "descuentoAlquiller", Value: bson.D{
-					{Key: "$sum", Value: "$descuentoAlquiller"},
-				}},
-				{Key: "descuentoVendedor", Value: bson.D{
-					{Key: "$sum", Value: "$descuentoVendedor"},
-				}},
-				{Key: "sucursal", Value: bson.D{
-					{Key: "$first", Value: "$sucursal.nombre"},
-				}},
-				{Key: "usuario", Value: bson.D{
-					{Key: "$first", Value: "$usuario.username"},
-				}},
-			}},
-		},
-		bson.D{
-			{Key: "$project", Value: bson.D{
-				{Key: "montoTotal", Value: 1},
-				{Key: "descuentoAcumulado", Value: 1},
-				{Key: "totalGanancia", Value: 1},
-				{Key: "descuentoAlquiller", Value: 1},
-				{Key: "descuentoVendedor", Value: 1},
-				{Key: "sucursal", Value: 1},
-				{Key: "usuario", Value: 1},
-			}},
-		},
-	}
-	cursor, err := collection.Aggregate(ctx, pipeline)
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(ctx)
-	var resultado []bson.M
-	cursor.All(ctx, &resultado)
-	fmt.Println(resultado)
-
-	return &resultado, nil
 }
