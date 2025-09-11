@@ -31,9 +31,9 @@ func RegistrarIngresoStockService(body *dto.IngresoStockDto, ctx context.Context
 	var cantidadTotal = 0
 	for _, v := range body.Stock {
 		PrecioUnitarioTotal += v.PrecioUnitario * float64(v.Cantidad)
-		subTotal += (v.PrecioUnitarioCompra * float64(v.Cantidad)) - v.Descuento
+		subTotal += (v.PrecioUnitarioCompra * float64(v.Cantidad))
 		descuento += v.Descuento
-		PrecioUnitarioTotalCompra += float64(v.Cantidad) * v.PrecioUnitarioCompra
+		PrecioUnitarioTotalCompra += (float64(v.Cantidad) * v.PrecioUnitarioCompra) - v.Descuento
 		cantidadTotal += v.Cantidad
 	}
 
@@ -79,11 +79,11 @@ func RegitrarDetalleIngresoService(detalle dto.StockDtoDetalleDto, ingresoID *bs
 		Ingreso:                   *ingresoID,
 		PrecioUnitarioCompra:      detalle.PrecioUnitarioCompra,
 		Descuento:                 detalle.Descuento,
-		SubTotal:                  (detalle.PrecioUnitarioCompra * float64(detalle.Cantidad)) - detalle.Descuento,
+		SubTotal:                  (detalle.PrecioUnitarioCompra * float64(detalle.Cantidad)),
 		FechaVencimiento:          fechaVencimiento,
 		CodigoStock:               codigoStock,
 		PrecioUnitarioTotal:       detalle.PrecioUnitario * float64(detalle.Cantidad),
-		PrecioUnitarioTotalCompra: detalle.PrecioUnitarioCompra * float64(detalle.Cantidad),
+		PrecioUnitarioTotalCompra: detalle.PrecioUnitarioCompra*float64(detalle.Cantidad) - detalle.Descuento,
 	}
 	err = repository.CrearDetalleIngresoRepository(detalleIngreso, ctx)
 	if err != nil {

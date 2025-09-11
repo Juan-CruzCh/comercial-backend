@@ -33,15 +33,14 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 
 	var codigo string = "VEN-" + strconv.Itoa(int(cantidad))
 	var montoTotal float64 = 0
-	var sudTotal float64 = 0
+	var subTotal float64 = 0
+
 	for _, v := range body.DetalleVenta {
+		subTotal += v.PrecioUnitario * float64(v.Cantidad)
 		montoTotal += v.PrecioUnitario * float64(v.Cantidad)
 	}
-	for _, v := range body.DetalleVenta {
-		sudTotal += v.PrecioUnitario * float64(v.Cantidad)
-	}
-	sudTotal = sudTotal - *body.Descuento
-	alquiler, vendedor, ganancia, descuentoAcumulado := realizarDescuentoVenta(sucursalID, sudTotal, ctx)
+	montoTotal = montoTotal - *body.Descuento
+	alquiler, vendedor, ganancia, descuentoAcumulado := realizarDescuentoVenta(sucursalID, montoTotal, ctx)
 	var venta model.VentaModel = model.VentaModel{
 		Codigo:             codigo,
 		MontoTotal:         utils.RoundFloat(montoTotal, 2),
@@ -57,7 +56,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		DescuentoVendedor:  vendedor,
 		TotalGanancia:      ganancia,
 		DescuentoAcumulado: descuentoAcumulado,
-		SubTotal:           utils.RoundFloat(sudTotal, 2),
+		SubTotal:           utils.RoundFloat(subTotal, 2),
 	}
 	ventaID, err := repository.RealizarVentaRepository(&venta, ctx)
 	if err != nil {
@@ -92,7 +91,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		_ = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}
 
-	var totalVenta float64 = utils.RoundFloat(caja.TotalVentas+sudTotal, 2)
+	var totalVenta float64 = utils.RoundFloat(caja.TotalVentas+montoTotal, 2)
 	var montoFinal float64 = utils.RoundFloat(totalVenta+caja.MontoInicial, 2)
 	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal, ctx)
 
@@ -102,23 +101,23 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	return ventaID, nil
 
 }
-func realizarDescuentoVenta(sucursal *bson.ObjectID, sudTotal float64, ctx context.Context) (al float64, ven float64, ganacia float64, totalDescuento float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
+func realizarDescuentoVenta(sucursal *bson.ObjectID, montoTotal float64, ctx context.Context) (al float64, ven float64, ganacia float64, totalDescuento float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
 	var alquiler float64 = 0
 	var vendedor float64 = 0
 
 	data, err := descuentoVentaRepository.ObtenerDescuentoVentaRepository(sucursal, ctx)
 	if err != nil {
-		return 0, 0, sudTotal, 0
+		return 0, 0, montoTotal, 0
 	}
 
 	var porcentajeAlquiler float64 = utils.Porcentaje(data.Alquiler)
 	var porcentajeVendedor float64 = utils.Porcentaje(data.Vendedor)
-	alquiler = (porcentajeAlquiler / 100) * sudTotal //se extrae la en plara el porcentaje
-	vendedor = (porcentajeVendedor / 100) * sudTotal //se extrae la en plara el porcentaje
+	alquiler = (porcentajeAlquiler / 100) * montoTotal //se extrae la en plara el porcentaje
+	vendedor = (porcentajeVendedor / 100) * montoTotal //se extrae la en plara el porcentaje
 	alquiler = utils.RoundFloat(alquiler, 2)
 	vendedor = utils.RoundFloat(vendedor, 2)
 	var descuentoAcumulado float64 = alquiler + vendedor
-	var totalGanancia float64 = sudTotal - descuentoAcumulado
+	var totalGanancia float64 = montoTotal - descuentoAcumulado
 	totalGanancia = utils.RoundFloat(totalGanancia, 2)
 
 	return alquiler, vendedor, totalGanancia, descuentoAcumulado
