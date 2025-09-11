@@ -11,11 +11,10 @@ type IngresoStockDto struct {
 }
 
 type StockDtoDetalleDto struct {
-	Cantidad         int       `json:"cantidad" binding:"required,gt=0"`
-	FechaVencimiento time.Time `json:"fechaVencimiento" binding:"omitempty"`
-	Producto         string    `json:"producto"  binding:"required"`
-	PrecioUnitario   float64   `json:"precioUnitario" binding:"gte=0"`
-	MontoTotal       float64   `json:"montoTotal" binding:"gte=0"`
-	Descuento        float64   `json:"descuento" binding:"gte=0"`
-	SudTotal         float64   `json:"sudTotal" binding:"gte=0"`
+	Cantidad             int       `json:"cantidad" binding:"required,gt=0"`
+	FechaVencimiento     time.Time `json:"fechaVencimiento" binding:"omitempty"`
+	Producto             string    `json:"producto"  binding:"required"`
+	PrecioUnitario       float64   `json:"precioUnitario" binding:"gte=0"`
+	PrecioUnitarioCompra float64   `json:"precioUnitarioCompra" binding:"gte=0"`
+	Descuento            float64   `json:"descuento" binding:"gte=0"`
 }

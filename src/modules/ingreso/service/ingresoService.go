@@ -17,30 +17,39 @@ import (
 func RegistrarIngresoStockService(body *dto.IngresoStockDto, ctx context.Context, usuario *bson.ObjectID) (*bson.ObjectID, error) {
 	fecha := utils.FechaHoraBolivia()
 	ProveedorID, err := utils.ValidadIdMongo(body.Proveedor)
+	if err != nil {
+		return nil, err
+	}
 	documento, err := ingresoRepository.CountDocumentsIngresoRepository(ctx)
 	if err != nil {
-		return &bson.NilObjectID, err
+		return nil, err
 	}
-	var montoTotal float64 = 0
+	var PrecioUnitarioTotalCompra float64 = 0
+	var PrecioUnitarioTotal float64 = 0
 	var subTotal float64 = 0
 	var descuento float64 = 0
+	var cantidadTotal = 0
 	for _, v := range body.Stock {
-		montoTotal += v.MontoTotal
-		subTotal += v.SudTotal
+		PrecioUnitarioTotal += v.PrecioUnitario * float64(v.Cantidad)
+		subTotal += (v.PrecioUnitarioCompra * float64(v.Cantidad)) - v.Descuento
 		descuento += v.Descuento
+		PrecioUnitarioTotalCompra += float64(v.Cantidad) * v.PrecioUnitarioCompra
+		cantidadTotal += v.Cantidad
 	}
 
 	var codigo string = "IGR-" + strconv.Itoa(int(documento))
 	var ingreso = model.IngresoModel{
-		Codigo:         codigo,
-		Fecha:          fecha,
-		Proveedor:      *ProveedorID,
-		Factura:        body.Factura,
-		MontoTotal:     montoTotal,
-		TotalDescuento: descuento,
-		Flag:           enum.EstadoNuevo,
-		Usuario:        *usuario,
-		SudTotal:       subTotal,
+		Codigo:                    codigo,
+		Fecha:                     fecha,
+		Proveedor:                 *ProveedorID,
+		Factura:                   body.Factura,
+		PrecioUnitarioTotal:       PrecioUnitarioTotal,
+		TotalDescuento:            descuento,
+		Flag:                      enum.EstadoNuevo,
+		Usuario:                   *usuario,
+		SudTotal:                  subTotal,
+		PrecioUnitarioTotalCompra: PrecioUnitarioTotalCompra,
+		CantidadTotal:             cantidadTotal,
 	}
 	ingresoID, err := ingresoRepository.CrearIngresoRepository(&ingreso, ctx)
 	if err != nil {
@@ -62,17 +71,19 @@ func RegitrarDetalleIngresoService(detalle dto.StockDtoDetalleDto, ingresoID *bs
 		fechaVencimiento = &detalle.FechaVencimiento
 	}
 	var detalleIngreso model.DetalleIngresoModel = model.DetalleIngresoModel{
-		Producto:         *productoID,
-		Cantidad:         detalle.Cantidad,
-		Fecha:            fecha,
-		PrecioUnitario:   detalle.PrecioUnitario,
-		Flag:             enum.EstadoNuevo,
-		Ingreso:          *ingresoID,
-		MontoTotal:       detalle.MontoTotal,
-		Descuento:        detalle.Descuento,
-		SudTotal:         detalle.SudTotal,
-		FechaVencimiento: fechaVencimiento,
-		CodigoStock:      codigoStock,
+		Producto:                  *productoID,
+		Cantidad:                  detalle.Cantidad,
+		Fecha:                     fecha,
+		PrecioUnitario:            detalle.PrecioUnitario,
+		Flag:                      enum.EstadoNuevo,
+		Ingreso:                   *ingresoID,
+		PrecioUnitarioCompra:      detalle.PrecioUnitarioCompra,
+		Descuento:                 detalle.Descuento,
+		SubTotal:                  (detalle.PrecioUnitarioCompra * float64(detalle.Cantidad)) - detalle.Descuento,
+		FechaVencimiento:          fechaVencimiento,
+		CodigoStock:               codigoStock,
+		PrecioUnitarioTotal:       detalle.PrecioUnitario * float64(detalle.Cantidad),
+		PrecioUnitarioTotalCompra: detalle.PrecioUnitarioCompra * float64(detalle.Cantidad),
 	}
 	err = repository.CrearDetalleIngresoRepository(detalleIngreso, ctx)
 	if err != nil {

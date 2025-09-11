@@ -40,8 +40,8 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	for _, v := range body.DetalleVenta {
 		sudTotal += v.PrecioUnitario * float64(v.Cantidad)
 	}
-	montoTotal = montoTotal - *body.Descuento
-	alquiler, vendedor, ganancia, descuentoAcumulado := realizarDescuentoVenta(sucursalID, montoTotal, ctx)
+	sudTotal = sudTotal - *body.Descuento
+	alquiler, vendedor, ganancia, descuentoAcumulado := realizarDescuentoVenta(sucursalID, sudTotal, ctx)
 	var venta model.VentaModel = model.VentaModel{
 		Codigo:             codigo,
 		MontoTotal:         utils.RoundFloat(montoTotal, 2),
@@ -92,7 +92,7 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 		_ = repository.RealizarVentaDetalleRepository(&detalleVenta, ctx)
 	}
 
-	var totalVenta float64 = utils.RoundFloat(caja.TotalVentas+montoTotal, 2)
+	var totalVenta float64 = utils.RoundFloat(caja.TotalVentas+sudTotal, 2)
 	var montoFinal float64 = utils.RoundFloat(totalVenta+caja.MontoInicial, 2)
 	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal, ctx)
 
@@ -102,23 +102,23 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	return ventaID, nil
 
 }
-func realizarDescuentoVenta(sucursal *bson.ObjectID, total float64, ctx context.Context) (al float64, ven float64, ganacia float64, totalDescuento float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
+func realizarDescuentoVenta(sucursal *bson.ObjectID, sudTotal float64, ctx context.Context) (al float64, ven float64, ganacia float64, totalDescuento float64) { //realiza descuento de cada venta un porcentaje para el alquiler y el vendedor
 	var alquiler float64 = 0
 	var vendedor float64 = 0
 
 	data, err := descuentoVentaRepository.ObtenerDescuentoVentaRepository(sucursal, ctx)
 	if err != nil {
-		return 0, 0, total, 0
+		return 0, 0, sudTotal, 0
 	}
 
 	var porcentajeAlquiler float64 = utils.Porcentaje(data.Alquiler)
 	var porcentajeVendedor float64 = utils.Porcentaje(data.Vendedor)
-	alquiler = (porcentajeAlquiler / 100) * total //se extrae la en plara el porcentaje
-	vendedor = (porcentajeVendedor / 100) * total //se extrae la en plara el porcentaje
+	alquiler = (porcentajeAlquiler / 100) * sudTotal //se extrae la en plara el porcentaje
+	vendedor = (porcentajeVendedor / 100) * sudTotal //se extrae la en plara el porcentaje
 	alquiler = utils.RoundFloat(alquiler, 2)
 	vendedor = utils.RoundFloat(vendedor, 2)
 	var descuentoAcumulado float64 = alquiler + vendedor
-	var totalGanancia float64 = total - descuentoAcumulado
+	var totalGanancia float64 = sudTotal - descuentoAcumulado
 	totalGanancia = utils.RoundFloat(totalGanancia, 2)
 
 	return alquiler, vendedor, totalGanancia, descuentoAcumulado
