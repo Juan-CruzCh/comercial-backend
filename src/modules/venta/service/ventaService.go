@@ -21,7 +21,7 @@ import (
 func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bson.ObjectID, sucursalID *bson.ObjectID) (*bson.ObjectID, error) {
 	caja, err := cajaRopository.BuscarCajaUsuarioRepository(usuarioID, ctx)
 	if err != nil {
-		return nil, errors.New("Ocurrio un erro en la caja de venta " + err.Error())
+		return nil, errors.New("Verifique la caja antes de realizar la venta " + err.Error())
 	}
 
 	fecha := utils.FechaHoraBolivia()
