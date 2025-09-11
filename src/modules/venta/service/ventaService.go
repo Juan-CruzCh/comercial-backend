@@ -29,16 +29,18 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 	if err != nil {
 		return &bson.NilObjectID, err
 	}
-	cantidad, _ := repository.CountDocumentsVentaRepository(ctx)
 
-	var codigo string = "VEN-" + strconv.Itoa(int(cantidad))
 	var montoTotal float64 = 0
 	var subTotal float64 = 0
-
 	for _, v := range body.DetalleVenta {
 		subTotal += v.PrecioUnitario * float64(v.Cantidad)
 		montoTotal += v.PrecioUnitario * float64(v.Cantidad)
 	}
+	if *body.Descuento > subTotal {
+		return nil, errors.New("el descuento no puede ser mayor al subTotal")
+	}
+	cantidad, _ := repository.CountDocumentsVentaRepository(ctx)
+	var codigo string = "VEN-" + strconv.Itoa(int(cantidad))
 	montoTotal = montoTotal - *body.Descuento
 	alquiler, vendedor, ganancia, descuentoAcumulado := realizarDescuentoVenta(sucursalID, montoTotal, ctx)
 	var venta model.VentaModel = model.VentaModel{
@@ -93,8 +95,8 @@ func RealizarVentaService(body *dto.VentaDto, ctx context.Context, usuarioID *bs
 
 	var totalVenta float64 = utils.RoundFloat(caja.TotalVentas+montoTotal, 2)
 	var montoFinal float64 = utils.RoundFloat(totalVenta+caja.MontoInicial, 2)
-	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal, ctx)
-
+	var totalDescuento float64 = utils.RoundFloat(*body.Descuento+caja.TotalDescuento, 2)
+	err = cajaRopository.AsignarTotalVentasCajaRepository(usuarioID, totalVenta, montoFinal, totalDescuento, ctx)
 	if err != nil {
 		return &bson.NilObjectID, errors.New("Ocurrio un error en la caja de venta al asignar el total vendido " + err.Error())
 	}
