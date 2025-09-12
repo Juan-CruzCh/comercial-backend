@@ -118,8 +118,8 @@ func realizarDescuentoVenta(sucursal *bson.ObjectID, montoTotal float64, ctx con
 	vendedor = (porcentajeVendedor / 100) * montoTotal //se extrae la en plara el porcentaje
 	alquiler = utils.RoundFloat(alquiler, 2)
 	vendedor = utils.RoundFloat(vendedor, 2)
-	var descuentoAcumulado float64 = alquiler + vendedor
-	var totalGanancia float64 = montoTotal - descuentoAcumulado
+	var descuentoAcumulado float64 = utils.RoundFloat(alquiler+vendedor, 2)
+	var totalGanancia float64 = utils.RoundFloat(montoTotal-descuentoAcumulado, 2)
 	totalGanancia = utils.RoundFloat(totalGanancia, 2)
 
 	return alquiler, vendedor, totalGanancia, descuentoAcumulado
