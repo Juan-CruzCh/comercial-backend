@@ -1,6 +1,7 @@
 package categoria
 
 import (
+	"comercial-backend/src/core/utils"
 	"comercial-backend/src/modules/categoria/dto"
 	"context"
 	"net/http"
@@ -59,5 +60,20 @@ func ActualizarCategoriaController(c *gin.Context) {
 }
 
 func EliminarCategoriaController(c *gin.Context) {
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	var categoriaId string = c.Param("id")
+	ID, err := utils.ValidadIdMongo(categoriaId)
 
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = eliminarCategoriaService(ID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "Eliminado"})
 }

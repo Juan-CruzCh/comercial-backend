@@ -28,17 +28,27 @@ func CrearCategoriaRepository(data *model.Categoria, ctx context.Context) error 
 	return nil
 }
 
-func ListarCategoriaRepository(ctx context.Context) ([]bson.M, error) {
+func ListarCategoriaRepository(ctx context.Context) (*[]bson.M, error) {
 	collection := config.MongoDatabase.Collection(enum.Categoria)
 	cursor, err := collection.Find(ctx, bson.M{"flag": enum.EstadoNuevo})
 
 	if err != nil {
-		return []bson.M{}, err
+		return nil, err
 	}
 	defer cursor.Close(ctx)
 	var resultado []bson.M
 
 	cursor.All(ctx, &resultado)
 
-	return resultado, nil
+	return &resultado, nil
+}
+
+func EliminarCategoriaRepository(categoriaId *bson.ObjectID, ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.Categoria)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": categoriaId}, bson.M{"$set": bson.M{"flag": enum.EstadoEliminado}})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

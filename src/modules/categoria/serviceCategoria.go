@@ -25,7 +25,7 @@ func crearCategoriaService(categoria *dto.CategoriaDto, ctx context.Context) err
 	}
 	return nil
 }
-func ListarCategoriaService(ctx context.Context) ([]bson.M, error) {
+func ListarCategoriaService(ctx context.Context) (*[]bson.M, error) {
 	data, err := repository.ListarCategoriaRepository(ctx)
 	if err != nil {
 		return nil, err
@@ -43,6 +43,10 @@ func ActualizarCategoriaService(c *gin.Context) {
 
 }
 
-func EliminarCategoriaService(c *gin.Context) {
-
+func eliminarCategoriaService(categoriID *bson.ObjectID, ctx context.Context) error {
+	err := repository.EliminarCategoriaRepository(categoriID, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
