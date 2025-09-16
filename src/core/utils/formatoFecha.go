@@ -16,7 +16,7 @@ func NormalizarRangoDeFechas(fechaInicio string, fechaFin string) (f1 time.Time,
 
 	parsedFin, err2 := time.Parse(layout, fechaFin)
 	if err2 != nil {
-		return f1, f2, errors.New("error fecha fil" + err1.Error())
+		return f1, f2, errors.New("error fecha fil" + err2.Error())
 
 	}
 
