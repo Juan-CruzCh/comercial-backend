@@ -83,3 +83,10 @@ func CalcularPaginas(total, limite int) int {
 	return int(math.Ceil(float64(total) / float64(limite)))
 }
 
+func Sort(campo string) bson.D {
+	return bson.D{
+		{Key: "$sort", Value: bson.D{
+			{Key: campo, Value: -1},
+		}},
+	}
+}

@@ -9,6 +9,8 @@ import (
 	"comercial-backend/src/modules/venta/model"
 	"context"
 	"errors"
+	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -181,4 +183,58 @@ func BuscarVentaPorIdRespository(idVenta *bson.ObjectID, ctx context.Context) (*
 	}
 	return &resultado[0], nil
 
+}
+func ListarVentaMesualRepository(sucursal *bson.ObjectID, ctx context.Context) (*[]bson.M, error) {
+	collection := config.MongoDatabase.Collection(enum.Venta)
+	now := time.Now()
+	inicioMes := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, now.Location())
+	hoy := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 99, now.Location())
+
+	var pipeline mongo.Pipeline = mongo.Pipeline{
+		bson.D{
+			{Key: "$match", Value: bson.D{
+				{Key: "sucursal", Value: sucursal},
+				{Key: "fechaVenta", Value: bson.D{
+					{Key: "$gte", Value: inicioMes},
+					{Key: "$lte", Value: hoy},
+				}},
+			}},
+		},
+		utils.Sort("fechaVenta"),
+		utils.Lookup("DetalleVenta", "_id", "venta", "detalleVenta"),
+		utils.Unwind("$detalleVenta", false),
+		bson.D{
+			{Key: "$group", Value: bson.D{
+				{Key: "_id", Value: bson.D{
+					{Key: "aqo", Value: bson.D{{Key: "$year", Value: "$fechaVenta"}}},
+					{Key: "mes", Value: bson.D{{Key: "$month", Value: "$fechaVenta"}}},
+					{Key: "dia", Value: bson.D{{Key: "$dayOfMonth", Value: "$fechaVenta"}}},
+				}},
+				{Key: "fecha", Value: bson.D{{Key: "$first", Value: "$fechaVenta"}}},
+				{Key: "montoTotal", Value: bson.D{{Key: "$sum", Value: "$montoTotal"}}},
+				{Key: "cantidad", Value: bson.D{{Key: "$sum", Value: "$detalleVenta.cantidad"}}},
+			}},
+		},
+		bson.D{
+			{Key: "$project", Value: bson.D{
+				{Key: "montoTotal", Value: 1},
+				{Key: "cantidad", Value: 1},
+				{Key: "fecha", Value: 1},
+				{Key: "_id", Value: 0},
+			}},
+		},
+	}
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+	var resultado []bson.M
+	err = cursor.All(ctx, &resultado)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	return &resultado, nil
 }

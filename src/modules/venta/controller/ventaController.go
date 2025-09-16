@@ -121,3 +121,19 @@ func ReporteVentasController(c *gin.Context) {
 	c.JSON(http.StatusOK, data)
 
 }
+
+func ListarReporteVentaMensualController(c *gin.Context) {
+	_, sucursalID, err := coreUtils.Request(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	data, err := service.ListarReporteVentaMensualService(sucursalID, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, data)
+}

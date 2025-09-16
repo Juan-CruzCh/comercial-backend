@@ -163,3 +163,11 @@ func ReporteVentasService(filtros *dto.BuscadorVentaDto, ctx context.Context) (*
 	}
 	return data, nil
 }
+
+func ListarReporteVentaMensualService(sucursalID *bson.ObjectID, ctx context.Context) (*[]bson.M, error) {
+	data, err := repository.ListarVentaMesualRepository(sucursalID, ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
