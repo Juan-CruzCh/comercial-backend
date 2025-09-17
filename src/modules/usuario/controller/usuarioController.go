@@ -49,11 +49,45 @@ func ListarUsuarioController(c *gin.Context) {
 }
 
 func ObtenerUsuarioController(c *gin.Context) {
-
+	id := c.Param("id")
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	ID, err := utils.ValidadIdMongo(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	data, err := service.ObtenerUsuarioIdService(ID, ctx)
+	c.JSON(http.StatusOK, gin.H{"status": data})
 }
 
 func ActualizarUsuarioController(c *gin.Context) {
-
+	validate := validator.New()
+	id := c.Param("id")
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+	defer cancel()
+	ID, err := utils.ValidadIdMongo(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var body dto.UsuarioDto
+	err = c.ShouldBindJSON(&body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = validate.Struct(body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err = service.ActualizarUsuarioService(ID, &body, ctx)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 }
 
 func EliminarUsuarioController(c *gin.Context) {

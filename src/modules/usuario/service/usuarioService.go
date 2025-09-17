@@ -14,7 +14,7 @@ import (
 )
 
 func CrearUsuarioService(u *dto.UsuarioDto, ctx context.Context) error {
-	_, err := repository.VeficarUsuarioExisteRepository(&u.Username, ctx)
+	err := repository.VeficarUsuarioExisteRepository(&u.Username, ctx)
 	if err != nil {
 		return err
 	}
@@ -57,8 +57,28 @@ func ObtenerUsuarioIdService(id *bson.ObjectID, ctx context.Context) (*bson.M, e
 	}
 	return data, nil
 }
-func actualizarUsuarioService(id string, u *dto.UsuarioDto, ctx context.Context) {
-
+func ActualizarUsuarioService(id *bson.ObjectID, u *dto.UsuarioDto, ctx context.Context) error {
+	err := repository.VeficarUsuarioExisteRepository(&u.Username, ctx)
+	if err != nil {
+		return err
+	}
+	sucursalId, err := utils.ValidadIdMongo(u.Sucursal)
+	if err != nil {
+		return err
+	}
+	var data model.UsuarioModel = model.UsuarioModel{
+		CI:        u.CI,
+		Nombre:    u.Nombre,
+		Apellidos: u.Apellidos,
+		Sucursal:  *sucursalId,
+		Rol:       u.Rol,
+		Username:  u.Username,
+	}
+	err = repository.ActualizarUsuarioRepository(id, &data, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func EliminarUsuarioService(id *bson.ObjectID, ctx context.Context) error {

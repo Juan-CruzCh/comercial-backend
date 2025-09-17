@@ -12,21 +12,31 @@ import (
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
-func VeficarUsuarioExisteRepository(username *string, ctx context.Context) (*model.UsuarioModel, error) {
+func VeficarUsuarioExisteRepository(username *string, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection(enum.Usuario)
 	cantidad, err := collection.CountDocuments(ctx, bson.M{"flag": enum.EstadoNuevo, "username": username})
 	if err != nil {
-		return &model.UsuarioModel{}, err
+		return err
 	}
 	if cantidad > 0 {
-		return &model.UsuarioModel{}, errors.New("El usuario ya existe")
+		return errors.New("El usuario ya existe")
 	}
-	return nil, nil
+	return nil
 }
 
 func CrearUsuarioRepository(data *model.UsuarioModel, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection(enum.Usuario)
 	_, err := collection.InsertOne(ctx, data)
+	if err != nil {
+		return err
+	}
+	return nil
+
+}
+
+func ActualizarUsuarioRepository(id *bson.ObjectID, data *model.UsuarioModel, ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.Usuario)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, data)
 	if err != nil {
 		return err
 	}
@@ -97,12 +107,13 @@ func BuscarUsuarioIdRepository(id *bson.ObjectID, ctx context.Context) (*bson.M,
 		utils.Lookup("Sucursal", "sucursal", "_id", "sucursal"),
 		bson.D{
 			{Key: "$project", Value: bson.D{
-
+				{Key: "ci", Value: 1},
 				{Key: "nombre", Value: 1},
 				{Key: "apellidos", Value: 1},
 				{Key: "rol", Value: 1},
 				{Key: "username", Value: 1},
 				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
+				{Key: "sucursalId", Value: utils.ArrayElemAt("$sucursal._id", 0)},
 			}},
 		},
 	}
