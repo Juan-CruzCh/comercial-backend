@@ -7,7 +7,7 @@ import (
 )
 
 func SucursalRouter(router *gin.RouterGroup) {
-	router.POST("/sucursal",controller.RegistrarSucursalController)
-	router.GET("/sucursal",controller.ListarSucursalController)
-
+	router.POST("/sucursal", controller.RegistrarSucursalController)
+	router.GET("/sucursal", controller.ListarSucursalController)
+	router.DELETE("/sucursal/:id", controller.EliminarSucursalController)
 }

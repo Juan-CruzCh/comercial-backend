@@ -60,3 +60,12 @@ func ListarDescuentoVentaRepository(ctx context.Context) (*[]bson.M, error) {
 	}
 	return &resultado, nil
 }
+
+func EliminarDescuentoVentaRepository(id *bson.ObjectID, ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.DescuentoVenta)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"flag": enum.EstadoEliminado}})
+	if err != nil {
+		return err
+	}
+	return nil
+}

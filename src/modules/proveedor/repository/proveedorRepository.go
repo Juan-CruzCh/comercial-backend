@@ -77,3 +77,12 @@ func ListarProveedorRepository(ci string, nombre string, celular string, empresa
 	}
 	return &resultado, nil
 }
+
+func EliminarProveedorRepository(id *bson.ObjectID, ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.Proveedor)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"flag": enum.EstadoEliminado}})
+	if err != nil {
+		return err
+	}
+	return nil
+}

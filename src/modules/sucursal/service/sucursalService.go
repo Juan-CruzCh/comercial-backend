@@ -11,28 +11,35 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func RegistrarSucursalService(body *dto.SucursalDto,ctx context.Context )error {
+func RegistrarSucursalService(body *dto.SucursalDto, ctx context.Context) error {
 
-	var sucursal model.SucursalModel= model.SucursalModel {
-		Nombre: body.Nombre,
+	var sucursal model.SucursalModel = model.SucursalModel{
+		Nombre:    body.Nombre,
 		Direccion: body.Direccion,
-		Fecha: time.Now(),
-		Flag: enum.EstadoNuevo,
-		
+		Fecha:     time.Now(),
+		Flag:      enum.EstadoNuevo,
 	}
 	err := repository.CrearSucursalRepository(&sucursal, ctx)
-	if(err != nil){
+	if err != nil {
 		return err
 	}
 	return nil
 
 }
 
-func ListarSucursalService(ctx context.Context )(*[]bson.M, error) {
+func ListarSucursalService(ctx context.Context) (*[]bson.M, error) {
 	resultado, err := repository.ListarSucursalRepository(ctx)
-	if(err != nil){
+	if err != nil {
 		return &[]bson.M{}, err
 	}
 	return resultado, nil
 
+}
+
+func EliminarSucursalService(id *bson.ObjectID, ctx context.Context) error {
+	err := repository.EliminarSucursalRepository(id, ctx)
+	if err != nil {
+		return err
+	}
+	return nil
 }
