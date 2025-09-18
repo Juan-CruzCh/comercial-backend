@@ -4,6 +4,8 @@ import (
 	"comercial-backend/src/core/config"
 	"comercial-backend/src/core/enum"
 	"comercial-backend/src/core/utils"
+
+	"comercial-backend/src/modules/usuario/dto"
 	"comercial-backend/src/modules/usuario/model"
 	"context"
 	"errors"
@@ -24,6 +26,17 @@ func VeficarUsuarioExisteRepository(username *string, ctx context.Context) error
 	return nil
 }
 
+func VeficarUsuarioActualizarExisteRepository(username *string, usuario *bson.ObjectID, ctx context.Context) error {
+	collection := config.MongoDatabase.Collection(enum.Usuario)
+	cantidad, err := collection.CountDocuments(ctx, bson.M{"flag": enum.EstadoNuevo, "username": username, "_id": bson.M{"$ne": usuario}})
+	if err != nil {
+		return err
+	}
+	if cantidad > 0 {
+		return errors.New("El usuario ya existe")
+	}
+	return nil
+}
 func CrearUsuarioRepository(data *model.UsuarioModel, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection(enum.Usuario)
 	_, err := collection.InsertOne(ctx, data)
@@ -34,9 +47,11 @@ func CrearUsuarioRepository(data *model.UsuarioModel, ctx context.Context) error
 
 }
 
-func ActualizarUsuarioRepository(id *bson.ObjectID, data *model.UsuarioModel, ctx context.Context) error {
+func ActualizarUsuarioRepository(id *bson.ObjectID, data *dto.ActualizarUsuarioDto, sucurcalID *bson.ObjectID, ctx context.Context) error {
 	collection := config.MongoDatabase.Collection(enum.Usuario)
-	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, data)
+	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{
+		"$set": bson.M{"ci": data.CI, "nombre": data.Nombre, "apellidos": data.Apellidos, "username": data.Username, "sucursal": sucurcalID, "rol": data.Rol},
+	})
 	if err != nil {
 		return err
 	}
@@ -72,6 +87,7 @@ func ListarUsuarioRepository(ctx context.Context) (*[]bson.M, error) {
 				{Key: "rol", Value: 1},
 				{Key: "username", Value: 1},
 				{Key: "sucursal", Value: utils.ArrayElemAt("$sucursal.nombre", 0)},
+				{Key: "sucursalId", Value: utils.ArrayElemAt("$sucursal._id", 0)},
 			}},
 		},
 	}
@@ -123,5 +139,8 @@ func BuscarUsuarioIdRepository(id *bson.ObjectID, ctx context.Context) (*bson.M,
 	}
 	defer cursor.Close(ctx)
 	cursor.All(ctx, &resultado)
+	if len(resultado) <= 0 {
+		return nil, errors.New("usuario no encontrado")
+	}
 	return &resultado[0], nil
 }

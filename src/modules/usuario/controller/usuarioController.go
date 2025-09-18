@@ -62,7 +62,6 @@ func ObtenerUsuarioController(c *gin.Context) {
 }
 
 func ActualizarUsuarioController(c *gin.Context) {
-	validate := validator.New()
 	id := c.Param("id")
 	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
@@ -71,13 +70,8 @@ func ActualizarUsuarioController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var body dto.UsuarioDto
+	var body dto.ActualizarUsuarioDto
 	err = c.ShouldBindJSON(&body)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	err = validate.Struct(body)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

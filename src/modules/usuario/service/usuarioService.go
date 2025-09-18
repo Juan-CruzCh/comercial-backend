@@ -57,8 +57,8 @@ func ObtenerUsuarioIdService(id *bson.ObjectID, ctx context.Context) (*bson.M, e
 	}
 	return data, nil
 }
-func ActualizarUsuarioService(id *bson.ObjectID, u *dto.UsuarioDto, ctx context.Context) error {
-	err := repository.VeficarUsuarioExisteRepository(&u.Username, ctx)
+func ActualizarUsuarioService(id *bson.ObjectID, u *dto.ActualizarUsuarioDto, ctx context.Context) error {
+	err := repository.VeficarUsuarioActualizarExisteRepository(&u.Username, id, ctx)
 	if err != nil {
 		return err
 	}
@@ -66,15 +66,8 @@ func ActualizarUsuarioService(id *bson.ObjectID, u *dto.UsuarioDto, ctx context.
 	if err != nil {
 		return err
 	}
-	var data model.UsuarioModel = model.UsuarioModel{
-		CI:        u.CI,
-		Nombre:    u.Nombre,
-		Apellidos: u.Apellidos,
-		Sucursal:  *sucursalId,
-		Rol:       u.Rol,
-		Username:  u.Username,
-	}
-	err = repository.ActualizarUsuarioRepository(id, &data, ctx)
+
+	err = repository.ActualizarUsuarioRepository(id, u, sucursalId, ctx)
 	if err != nil {
 		return err
 	}
