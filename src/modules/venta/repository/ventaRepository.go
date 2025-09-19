@@ -144,6 +144,7 @@ func ListarVentasRepository(filtros *dto.BuscadorVentaDto, pagina int, limite in
 		Data:    data,
 		Paginas: paginas,
 	}
+
 	return &resultado, nil
 
 }
